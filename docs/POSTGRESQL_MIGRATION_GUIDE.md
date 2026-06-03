@@ -250,7 +250,7 @@ if __name__ == "__main__":
 #### 🏥 Health Check
 ```bash
 # Run health check
-python3 ./scripts/cloudstore_cli.py db-health
+python3 ./scripts/aipoweredstore_cli.py db-health
 
 # Check connection pool status
 python3 -c "

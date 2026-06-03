@@ -78,7 +78,7 @@ POST /api/servers
 ### Platform Status
 
 ```bash
-python3 ./scripts/cloudstore_cli.py platform-status
+python3 ./scripts/aipoweredstore_cli.py platform-status
 ```
 
 Output:
@@ -95,7 +95,7 @@ All Servers:
 ### Server Discovery
 
 ```bash
-python3 ./scripts/cloudstore_cli.py discover-server 192.168.1.101
+python3 ./scripts/aipoweredstore_cli.py discover-server 192.168.1.101
 ```
 
 Output:
@@ -216,7 +216,7 @@ python3 ./scripts/platform_cli.py status
 ### Database Health
 
 ```bash
-python3 ./scripts/cloudstore_cli.py db-health
+python3 ./scripts/aipoweredstore_cli.py db-health
 ```
 
 ## Troubleshooting

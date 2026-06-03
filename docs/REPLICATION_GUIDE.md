@@ -130,7 +130,7 @@ Response:
 
 ### Check Replication Status
 ```bash
-python3 scripts/cloudstore_cli.py replication-sync-status
+python3 scripts/aipoweredstore_cli.py replication-sync-status
 ```
 
 Output:
@@ -154,12 +154,12 @@ Replicated Tables: users, applications, user_applications, billing_activities, a
 ### Manual Sync
 ```bash
 # Sync specific table to a server
-python3 scripts/cloudstore_cli.py replication-sync-table users 192.168.1.11
+python3 scripts/aipoweredstore_cli.py replication-sync-table users 192.168.1.11
 ```
 
 ### Test Connectivity
 ```bash
-python3 scripts/cloudstore_cli.py replication-test-sync 192.168.1.11
+python3 scripts/aipoweredstore_cli.py replication-test-sync 192.168.1.11
 ```
 
 ## How It Works
@@ -245,10 +245,10 @@ tail -f logs/output_print_logs.txt | grep REPLICATION
 ### Queue Growing
 ```bash
 # Check queue size
-python3 scripts/cloudstore_cli.py replication-sync-status
+python3 scripts/aipoweredstore_cli.py replication-sync-status
 
 # Check peer connectivity
-python3 scripts/cloudstore_cli.py replication-test-sync <peer_ip>
+python3 scripts/aipoweredstore_cli.py replication-test-sync <peer_ip>
 
 # Check logs
 grep "REPLICATION" logs/output_print_logs.txt
@@ -260,7 +260,7 @@ grep "REPLICATION" logs/output_print_logs.txt
 grep SYNC_SECRET .env
 
 # Test manual sync
-python3 scripts/cloudstore_cli.py replication-sync-table users <peer_ip>
+python3 scripts/aipoweredstore_cli.py replication-sync-table users <peer_ip>
 
 # Check network connectivity
 curl -k https://<peer_ip>/api/sync/health
@@ -269,11 +269,11 @@ curl -k https://<peer_ip>/api/sync/health
 ### Data Inconsistency
 ```bash
 # Compare record counts
-python3 scripts/cloudstore_cli.py replication-sync-status
+python3 scripts/aipoweredstore_cli.py replication-sync-status
 
 # Manual full sync
 for table in users applications user_applications billing_activities sso_tokens; do
-    python3 scripts/cloudstore_cli.py replication-sync-table $table <peer_ip>
+    python3 scripts/aipoweredstore_cli.py replication-sync-table $table <peer_ip>
 done
 ```
 

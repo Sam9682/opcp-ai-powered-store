@@ -35,11 +35,11 @@ export POSTGRES_PASSWORD=swautomorph_secure_password_2026
 
 # Initialize database
 echo "💾 Initializing PostgreSQL database..."
-python3 ./scripts/cloudstore_cli.py init-db
+python3 ./scripts/aipoweredstore_cli.py init-db
 
 # Verify setup
 echo "✅ Verifying PostgreSQL setup..."
-python3 ./scripts/cloudstore_cli.py status --show-env
+python3 ./scripts/aipoweredstore_cli.py status --show-env
 
 echo ""
 echo "🎉 PostgreSQL setup complete!"

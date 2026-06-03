@@ -44,7 +44,7 @@ The platform includes automated migration logic for seamlessly transitioning fro
 1. **Via Database CLI** (Recommended):
 ```bash
 # Using the sf_cli tool
-python3 ./scripts/cloudstore_cli.py migrate-to-postgres
+python3 ./scripts/aipoweredstore_cli.py migrate-to-postgres
 ```
 
 2. **Via API** (Admin only):

@@ -43,7 +43,7 @@ AI-SwAutoMorph is a **centralized application deployment and management platform
 │   ├── 🗄️ DATABASE_IMPROVEMENTS.md  # Database architecture
 │   └── 👥 USER_GUIDE.md             # AI agent usage guide
 ├── 📁 scripts/                      # CLI tools and utilities
-│   ├── 💻 cloudstore_cli.py                    # Command-line interface
+│   ├── 💻 aipoweredstore_cli.py                    # Command-line interface
 │   └── 🔌 mcp_server.py             # Model Context Protocol server
 ├── 📁 shared/                       # Context files for virtual agents
 │   ├── 📝 MODIFY_CODE_context.md    # Developer agent context
@@ -248,7 +248,7 @@ AI-SwAutoMorph est une **plateforme centralisée de déploiement et de gestion d
 │   ├── 🗄️ DATABASE_IMPROVEMENTS.md  # Architecture de base de données
 │   └── 👥 USER_GUIDE.md             # Guide d'utilisation des agents IA
 ├── 📁 scripts/                      # Outils CLI et utilitaires
-│   ├── 💻 cloudstore_cli.py                    # Interface en ligne de commande
+│   ├── 💻 aipoweredstore_cli.py                    # Interface en ligne de commande
 │   └── 🔌 mcp_server.py             # Serveur Model Context Protocol
 ├── 📁 shared/                       # Fichiers de contexte pour agents virtuels
 │   ├── 📝 MODIFY_CODE_context.md    # Contexte agent développeur

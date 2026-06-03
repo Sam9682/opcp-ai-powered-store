@@ -206,7 +206,7 @@ cp privkey.key /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/privateKey_
 
 # Set proper permissions
 chmod 644 /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/fullchain_domain.crt
-chmod 600 /home/ubuntu/opcp-cloudstore-docker-ah/ssl/yourdomain.com/privateKey_domain.key
+chmod 600 /home/ubuntu/opcp-aipoweredstore-docker-ah/ssl/yourdomain.com/privateKey_domain.key
 ```
 
 ### 3. Deploy Configuration
