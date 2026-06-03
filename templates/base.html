@@ -16,6 +16,7 @@
                     {% if session.user_id %}
                         {% if username %}<span class="nav-user">{{ get_text('welcome') }}, {{ username }}</span>{% endif %}
                         <a href="javascript:void(0)" onclick="showTab('apps')" id="navApps" class="nav-active">{{ get_text('applications') }}</a>
+                        <a href="javascript:void(0)" onclick="showTab('orchestratorServerless')" id="navOrchestratorServerless">🚀 Serverless</a>
                         <a href="javascript:void(0)" onclick="showTab('billing')" id="navBilling">{{ get_text('billing') }}</a>
                         <a href="javascript:void(0)" onclick="showTab('security')" id="navSecurity">🔐</a>
                         {% if username == 'admin' %}
@@ -39,6 +40,7 @@
                                 <a href="{{ url_for('main.view_doc', filename='DEPLOYMENT_GUIDE.md') }}">Deployment Guide</a>
                                 <a href="{{ url_for('main.userguide') }}">User Guide</a>
                                 <a href="{{ url_for('main.view_doc', filename='LIST_OF_APP_AVAILABLE.md') }}">Available Applications</a>
+                                <a href="{{ url_for('main.view_doc', filename='SERVERLESS.md') }}">Serverless</a>
                             </div>
                         </div>
                         <a href="{{ url_for('auth.logout') }}" class="nav-logout">{{ get_text('logout') }}</a>
@@ -50,6 +52,7 @@
                                 <a href="{{ url_for('main.view_doc', filename='DEPLOYMENT_GUIDE.md') }}">Deployment Guide</a>
                                 <a href="{{ url_for('main.userguide') }}">User Guide</a>
                                 <a href="{{ url_for('main.view_doc', filename='LIST_OF_APP_AVAILABLE.md') }}">Available Applications</a>
+                                <a href="{{ url_for('main.view_doc', filename='SERVERLESS.md') }}">Serverless</a>
                             </div>
                         </div>
                         <a href="{{ url_for('main.index') }}">{{ get_text('login') }}</a>
@@ -70,6 +73,7 @@
                 {% if session.user_id %}
                     {% if username %}<span class="nav-user">{{ get_text('welcome') }}, {{ username }}</span>{% endif %}
                     <a href="javascript:void(0)" onclick="showTab('apps')">{{ get_text('applications') }}</a>
+                    <a href="javascript:void(0)" onclick="showTab('orchestratorServerless')">🚀 Serverless</a>
                     <a href="javascript:void(0)" onclick="showTab('billing')">{{ get_text('billing') }}</a>
                     <a href="javascript:void(0)" onclick="showTab('security')">🔐 {{ get_text('account_security') }}</a>
                     {% if username == 'admin' %}
@@ -85,12 +89,14 @@
                     <a href="{{ url_for('main.view_doc', filename='DEPLOYMENT_GUIDE.md') }}">Deployment Guide</a>
                     <a href="{{ url_for('main.userguide') }}">User Guide</a>
                     <a href="{{ url_for('main.view_doc', filename='LIST_OF_APP_AVAILABLE.md') }}">Available Applications</a>
+                    <a href="{{ url_for('main.view_doc', filename='SERVERLESS.md') }}">Serverless</a>
                     <a href="{{ url_for('auth.logout') }}" class="nav-logout">{{ get_text('logout') }}</a>
                 {% else %}
                     <a href="{{ url_for('main.view_doc', filename='ARCHITECTURE_GUIDE.md') }}">Architecture Guide</a>
                     <a href="{{ url_for('main.view_doc', filename='DEPLOYMENT_GUIDE.md') }}">Deployment Guide</a>
                     <a href="{{ url_for('main.userguide') }}">User Guide</a>
                     <a href="{{ url_for('main.view_doc', filename='LIST_OF_APP_AVAILABLE.md') }}">Available Applications</a>
+                    <a href="{{ url_for('main.view_doc', filename='SERVERLESS.md') }}">Serverless</a>
                     <a href="{{ url_for('main.index') }}">{{ get_text('login') }}</a>
                 {% endif %}
                 <div class="lang-toggle">
@@ -182,6 +188,9 @@
             } else if (activeTab === 'security') {
                 const navSecurity = document.getElementById('navSecurity');
                 if (navSecurity) navSecurity.classList.add('nav-active');
+            } else if (activeTab === 'orchestratorServerless') {
+                const navOrchestratorServerless = document.getElementById('navOrchestratorServerless');
+                if (navOrchestratorServerless) navOrchestratorServerless.classList.add('nav-active');
             }
         }
         

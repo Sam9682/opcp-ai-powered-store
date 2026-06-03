@@ -18,6 +18,8 @@
                         Step-by-step deployment and usage guide
                     {% elif file == 'DATABASE_IMPROVEMENTS.md' %}
                         Database schema and performance improvements
+                    {% elif file == 'SERVERLESS.md' %}
+                        Serverless orchestration: on-demand Docker container execution, API reference, and security model
                     {% else %}
                         {{ file.replace('.md', '').replace('_', ' ') }} documentation
                     {% endif %}

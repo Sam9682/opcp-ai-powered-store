@@ -23,6 +23,7 @@ from .routes.billing_routes import billing_bp
 from .routes.orchestrator_routes import orchestrator_bp
 from .routes.replication_routes import replication_bp, init_replication_routes
 from .routes.security_routes import security_bp
+from .routes.serverless_routes import serverless_bp
 
 # Redirect all print() statements to log files
 class PrintLogger:
@@ -106,5 +107,6 @@ def create_app():
     app.register_blueprint(orchestrator_bp)
     app.register_blueprint(replication_bp)
     app.register_blueprint(security_bp)
+    app.register_blueprint(serverless_bp)
     
     return app

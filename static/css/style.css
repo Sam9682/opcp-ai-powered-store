@@ -2395,3 +2395,48 @@ body {
     color: var(--color-text);
     font-size: 0.875rem;
 }
+
+/* ============================================
+   JOB STATUS BADGES (Serverless)
+   ============================================ */
+.job-status-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: capitalize;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+.job-status-badge.status-pending {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.job-status-badge.status-running {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.job-status-badge.status-completed {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.job-status-badge.status-failed {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.job-status-badge.status-timeout {
+    background-color: #fd7e14;
+    color: #ffffff;
+}
+
+.job-status-badge.status-cancelled {
+    background-color: #ffc107;
+    color: #212529;
+}

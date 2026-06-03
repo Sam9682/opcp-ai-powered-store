@@ -792,6 +792,74 @@
     </div>
     {% endif %}
     
+    <!-- Serverless Docker Execution Section -->
+    <div id="orchestratorServerlessSection" class="tab-content" style="display: none;">
+        <div class="section-header">
+            <h2>🚀 Application Orchestrator - Serverless Jobs</h2>
+            <button class="btn btn-secondary" onclick="refreshJobList()">🔄 Refresh</button>
+        </div>
+
+        <!-- Metrics Summary Panel -->
+        <div id="serverlessMetricsPanel" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; border: 1px solid #ddd;">
+            <h3 style="margin-top: 0;">📊 Metrics</h3>
+            <div id="serverlessMetricsContent">
+                <p>Loading metrics...</p>
+            </div>
+        </div>
+
+        <!-- Job Submission Form -->
+        <div class="user-form" style="display: block; margin-bottom: 20px;">
+            <h3>Submit New Job</h3>
+            <form id="serverlessJobForm" onsubmit="event.preventDefault(); submitServerlessJob();">
+                <div class="form-group">
+                    <label for="serverlessImage">Image (required):</label>
+                    <input type="text" id="serverlessImage" placeholder="e.g. docker.io/library/python:3.11" required>
+                </div>
+                <div class="form-group">
+                    <label for="serverlessCommand">Command (required, space-separated):</label>
+                    <input type="text" id="serverlessCommand" placeholder="e.g. python script.py --flag" required>
+                </div>
+                <div class="form-group">
+                    <label for="serverlessEnv">Environment Variables (JSON, optional):</label>
+                    <textarea id="serverlessEnv" rows="3" placeholder='{"KEY": "value", "OTHER": "val2"}'></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="serverlessTimeout">Timeout in seconds (optional):</label>
+                    <input type="number" id="serverlessTimeout" min="1" max="3600" placeholder="300">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Job</button>
+            </form>
+        </div>
+
+        <!-- Job List Table -->
+        <div class="table-container" style="margin-bottom: 20px;">
+            <h3>Jobs</h3>
+            <table class="users-table" id="serverlessJobsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="serverlessJobsBody">
+                    <tr><td colspan="5">No jobs loaded yet. Click Refresh to load.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Job Detail/Result View Panel -->
+        <div id="serverlessJobDetail" style="display: none; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; border: 1px solid #ddd;">
+            <h3>Job Details</h3>
+            <div id="serverlessJobDetailContent">
+                <p>Select a job to view details.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="document.getElementById('serverlessJobDetail').style.display='none';">Close</button>
+        </div>
+    </div>
+
     <!-- Deployment Logs Section -->
     <!-- Logs section removed from main panel -->
         </div>
@@ -935,6 +1003,11 @@ const APP_NOT_DEPLOYED_MESSAGE = 'deployApp.sh not found';
 window.showDashboardTab = showTab;
 
 function showTab(tab) {
+    // Stop serverless auto-refresh when switching away from that tab
+    if (typeof stopServerlessAutoRefresh === 'function') {
+        stopServerlessAutoRefresh();
+    }
+    
     // Hide all sections
     document.getElementById('appsSection').style.display = 'none';
     document.getElementById('billingSection').style.display = 'none';
@@ -962,6 +1035,9 @@ function showTab(tab) {
     
     const settingsSection = document.getElementById('settingsSection');
     if (settingsSection) settingsSection.style.display = 'none';
+    
+    const orchestratorServerlessSection = document.getElementById('orchestratorServerlessSection');
+    if (orchestratorServerlessSection) orchestratorServerlessSection.style.display = 'none';
     
     // Control virtual agents panel visibility
     const agentsPanel = document.getElementById('agentsPanel');
@@ -1023,6 +1099,13 @@ function showTab(tab) {
             settingsSection.style.display = 'block';
             loadConfigTable();
         }
+    } else if (tab === 'orchestratorServerless') {
+        if (orchestratorServerlessSection) {
+            orchestratorServerlessSection.style.display = 'block';
+            refreshJobList();
+            loadServerlessMetrics();
+            startServerlessAutoRefresh();
+        }
     }
     
     // Update navbar active states
@@ -1032,7 +1115,7 @@ function showTab(tab) {
     
     // Only close dropdowns if we're actually switching tabs within the dashboard
     // Don't close dropdowns for Help menu navigation since those are external links
-    if (tab === 'apps' || tab === 'billing' || tab === 'security' || tab === 'users' || tab === 'appManagement' || tab === 'servers' || tab === 'orchestrator' || tab === 'deployments' || tab === 'database') {
+    if (tab === 'apps' || tab === 'billing' || tab === 'security' || tab === 'users' || tab === 'appManagement' || tab === 'servers' || tab === 'orchestrator' || tab === 'deployments' || tab === 'database' || tab === 'orchestratorServerless') {
         const configDropdown = document.getElementById('navConfigDropdown');
         const helpDropdown = document.getElementById('navHelpDropdown');
         if (configDropdown) configDropdown.style.display = 'none';

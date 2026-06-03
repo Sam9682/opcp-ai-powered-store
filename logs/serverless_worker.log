@@ -1,0 +1,207 @@
+2026-06-02 22:06:59,806 - src.serverless.worker - INFO - Initializing serverless worker: test-worker-42
+2026-06-02 22:06:59,817 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:06:59,826 - src.serverless.worker - INFO - Worker test-worker-42 starting...
+2026-06-02 22:06:59,835 - src.serverless.worker - INFO - Worker test-worker-42 has stopped.
+2026-06-02 22:06:59,876 - src.serverless.worker - INFO - Initializing serverless worker: worker-LWI5CG549103J-14384
+2026-06-02 22:06:59,885 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:06:59,892 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-14384 starting...
+2026-06-02 22:06:59,902 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-14384 has stopped.
+2026-06-02 22:06:59,939 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:06:59,953 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:06:59,961 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:06:59,970 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:00,015 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:00,027 - src.serverless.worker - ERROR - Failed to detect container runtime: No supported container runtime found
+2026-06-02 22:07:00,071 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:00,080 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:00,092 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:00,103 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:00,137 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:00,145 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:00,157 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:00,164 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:00,198 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:00,205 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:00,215 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:00,224 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:00,243 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:07:00,249 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:07:00,313 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:07:00,324 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:07:00,358 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:07:00,370 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:07:00,378 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:07:00,401 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:07:00,409 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:07:00,420 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:07:00,431 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:07:00,442 - src.serverless.worker - INFO - Worker test-worker claimed job job-123
+2026-06-02 22:07:00,489 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:07:55,419 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,434 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,443 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,456 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,514 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,523 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,534 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,545 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,592 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,602 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,610 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,620 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,674 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,683 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,693 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,705 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,750 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,759 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,769 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,780 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,823 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:07:55,834 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:07:55,843 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:07:55,856 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:07:55,883 - src.serverless.worker - INFO - Execution start: job_id=job-abc image=python:3.11 command=['python', '-c', "print('hello')"]
+2026-06-02 22:07:55,901 - src.serverless.worker - ERROR - Execution end: job_id=job-abc status=failed duration=0.02s error=test pull fail
+2026-06-02 22:07:57,260 - src.serverless.worker - ERROR - Execution end: job_id=job-fail status=failed duration=0.00s error=pull failed
+2026-06-02 22:07:57,347 - src.serverless.worker - WARNING - Execution end: job_id=job-timeout status=timeout duration=0.00s
+2026-06-02 22:07:57,441 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:07:57,452 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:08:42,660 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,666 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,669 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,672 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,688 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,691 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,694 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,697 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,713 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,716 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,719 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,723 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,737 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,742 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,746 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,749 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,762 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,766 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,768 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,771 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,786 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:42,789 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:42,792 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:42,794 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:42,803 - src.serverless.worker - INFO - Execution start: job_id=job-abc image=python:3.11 command=['python', '-c', "print('hello')"]
+2026-06-02 22:08:42,808 - src.serverless.worker - ERROR - Execution end: job_id=job-abc status=failed duration=0.01s error=test pull fail
+2026-06-02 22:08:42,814 - src.serverless.worker - ERROR - Execution end: job_id=job-fail status=failed duration=0.00s error=pull failed
+2026-06-02 22:08:42,824 - src.serverless.worker - WARNING - Execution end: job_id=job-timeout status=timeout duration=0.00s
+2026-06-02 22:08:42,832 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:08:42,835 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:08:53,300 - src.serverless.worker - INFO - Initializing serverless worker: test-worker-42
+2026-06-02 22:08:53,303 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,309 - src.serverless.worker - INFO - Worker test-worker-42 starting...
+2026-06-02 22:08:53,313 - src.serverless.worker - INFO - Worker test-worker-42 has stopped.
+2026-06-02 22:08:53,336 - src.serverless.worker - INFO - Initializing serverless worker: worker-LWI5CG549103J-21476
+2026-06-02 22:08:53,339 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,346 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-21476 starting...
+2026-06-02 22:08:53,351 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-21476 has stopped.
+2026-06-02 22:08:53,370 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,376 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,378 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,383 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,400 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,407 - src.serverless.worker - ERROR - Failed to detect container runtime: No supported container runtime found
+2026-06-02 22:08:53,427 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,431 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,434 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,450 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,477 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,481 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,487 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,491 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,510 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,515 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,518 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,525 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,540 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:08:53,548 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:08:53,562 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:08:53,571 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:08:53,579 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:08:53,586 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:08:53,604 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:08:53,619 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:08:53,626 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:08:53,634 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:08:53,641 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:08:53,648 - src.serverless.worker - INFO - Worker test-worker claimed job job-123
+2026-06-02 22:08:53,652 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:08:53,672 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,676 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,680 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,686 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,705 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,710 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,715 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,718 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,738 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,742 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,747 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,755 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,773 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,778 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,786 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,793 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,819 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,823 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,830 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,836 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,858 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:08:53,862 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:08:53,870 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:08:53,876 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:08:53,892 - src.serverless.worker - INFO - Execution start: job_id=job-abc image=python:3.11 command=['python', '-c', "print('hello')"]
+2026-06-02 22:08:53,898 - src.serverless.worker - ERROR - Execution end: job_id=job-abc status=failed duration=0.01s error=test pull fail
+2026-06-02 22:08:53,912 - src.serverless.worker - ERROR - Execution end: job_id=job-fail status=failed duration=0.00s error=pull failed
+2026-06-02 22:08:53,925 - src.serverless.worker - WARNING - Execution end: job_id=job-timeout status=timeout duration=0.00s
+2026-06-02 22:08:53,937 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:08:53,941 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:21:00,418 - src.serverless.worker - INFO - Initializing serverless worker: test-worker-42
+2026-06-02 22:21:00,464 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,464 - src.serverless.worker - INFO - Worker test-worker-42 starting...
+2026-06-02 22:21:00,465 - src.serverless.worker - INFO - Worker test-worker-42 has stopped.
+2026-06-02 22:21:00,468 - src.serverless.worker - INFO - Initializing serverless worker: worker-LWI5CG549103J-54181
+2026-06-02 22:21:00,468 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,468 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-54181 starting...
+2026-06-02 22:21:00,469 - src.serverless.worker - INFO - Worker worker-LWI5CG549103J-54181 has stopped.
+2026-06-02 22:21:00,470 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:21:00,470 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,471 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:21:00,472 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:21:00,475 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:21:00,475 - src.serverless.worker - ERROR - Failed to detect container runtime: No supported container runtime found
+2026-06-02 22:21:00,479 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:21:00,479 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,480 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:21:00,480 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:21:00,482 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:21:00,482 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,482 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:21:00,482 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:21:00,484 - src.serverless.worker - INFO - Initializing serverless worker: w1
+2026-06-02 22:21:00,484 - src.serverless.worker - INFO - Detected container runtime: MagicMock
+2026-06-02 22:21:00,484 - src.serverless.worker - INFO - Worker w1 starting...
+2026-06-02 22:21:00,484 - src.serverless.worker - INFO - Worker w1 has stopped.
+2026-06-02 22:21:00,485 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:21:00,485 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:21:00,486 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:21:00,486 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:21:00,487 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:21:00,488 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:21:00,488 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
+2026-06-02 22:21:00,489 - src.serverless.worker - INFO - Worker test-worker starting main loop
+2026-06-02 22:21:00,489 - src.serverless.worker - INFO - Worker test-worker running daily log cleanup
+2026-06-02 22:21:00,489 - src.serverless.log_cleanup - INFO - Log cleanup completed: 1 log entries deleted, 1 jobs deleted
+2026-06-02 22:21:00,490 - src.serverless.worker - INFO - Cleanup completed: 1 logs, 1 jobs removed
+2026-06-02 22:21:00,490 - src.serverless.worker - INFO - Worker test-worker claimed job job-123
+2026-06-02 22:21:00,490 - src.serverless.worker - INFO - Worker test-worker shutting down gracefully
