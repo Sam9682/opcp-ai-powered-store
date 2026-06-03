@@ -82,7 +82,7 @@ DEPLOYMENT_ID=$(docker exec postgres psql -U $DB_USER -d ai_swautomorph -t -c \
   "SELECT id FROM deployments WHERE user_id = $USER_ID AND application_name = '$NAME_OF_APPLICATION' ORDER BY updated_at DESC LIMIT 1" | xargs)
 
 # Record backup
-python3 /home/ubuntu/ai-swautomorph/scripts/add_backup_to_deployment.py \
+python3 /home/ubuntu/opcp-ai-powered-store/scripts/add_backup_to_deployment.py \
   --deployment-id $DEPLOYMENT_ID \
   --backup-file "$(basename $BACKUP_FILE)" \
   --s3-location "${S3_PATH}$(basename $BACKUP_FILE)" \
@@ -139,7 +139,7 @@ psql -U swautomorph -d ai_swautomorph -f migration/add_backups_history_to_deploy
 ### Step 1: Apply Database Migration (Existing Databases Only)
 
 ```bash
-cd /home/ubuntu/ai-swautomorph
+cd /home/ubuntu/opcp-ai-powered-store
 psql -U swautomorph -d ai_swautomorph -f migration/add_backups_history_to_deployments.sql
 ```
 
@@ -284,7 +284,7 @@ If issues occur, rollback using:
 
 ```bash
 # 1. Revert code changes
-cd /home/ubuntu/ai-swautomorph
+cd /home/ubuntu/opcp-ai-powered-store
 git checkout HEAD -- src/routes/api_routes.py templates/dashboard.html shared/BACKUP_DATABASE_context.md
 
 # 2. Remove database column

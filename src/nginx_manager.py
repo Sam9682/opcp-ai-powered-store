@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 NGINX_CONF_DIR = "/etc/nginx/sites-available"
 NGINX_ENABLED_DIR = "/etc/nginx/sites-enabled"
-NGINX_CONF_FILE = "ai-swautomorph"
+NGINX_CONF_FILE = "opcp-ai-powered-store"
 
 def generate_location_block(user_name: str, app_name: str, deployment_url: str, user_appli_url: str) -> str:
     """Generate nginx location block for user application"""

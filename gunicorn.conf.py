@@ -24,7 +24,7 @@ loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 # Process naming
-proc_name = 'ai-swautomorph'
+proc_name = 'opcp-ai-powered-store'
 
 # Daemon mode
 daemon = True
@@ -42,6 +42,6 @@ reload = os.environ.get('FLASK_ENV') == 'development'
 
 # Environment variables
 raw_env = [
-    'PYTHONPATH=/home/ubuntu/ai-swautomorph',
+    'PYTHONPATH=/home/ubuntu/opcp-ai-powered-store',
     'USE_POSTGRES=true'
 ]

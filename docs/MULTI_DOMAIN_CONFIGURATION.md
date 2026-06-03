@@ -19,7 +19,7 @@ This domain will:
 - Host the main Flask application on `http://localhost:${FLASK_PORT:-5000}`
 - Include all standard location blocks (/, /gitea/, etc.)
 - Support ModSecurity WAF protection (if enabled)
-- Use SSL certificates from `/home/ubuntu/ai-swautomorph/ssl/softfluid.fr/`
+- Use SSL certificates from `/home/ubuntu/opcp-ai-powered-store/ssl/softfluid.fr/`
 
 ### Secondary Domains Configuration
 
@@ -61,7 +61,7 @@ SECONDARY_DOMAINS=hypervisia.fr:hypervisia.fr www.hypervisia.fr:https://softflui
 Each domain (main and secondary) must have its SSL certificates in the following structure:
 
 ```
-/home/ubuntu/ai-swautomorph/ssl/
+/home/ubuntu/opcp-ai-powered-store/ssl/
 ├── softfluid.fr/
 │   ├── fullchain_domain.crt
 │   └── privateKey_domain.key
@@ -117,8 +117,8 @@ server {
     listen 443 ssl;
     server_name hypervisia.fr www.hypervisia.fr;
     
-    ssl_certificate /home/ubuntu/ai-swautomorph/ssl/hypervisia.fr/fullchain_domain.crt;
-    ssl_certificate_key /home/ubuntu/ai-swautomorph/ssl/hypervisia.fr/privateKey_domain.key;
+    ssl_certificate /home/ubuntu/opcp-ai-powered-store/ssl/hypervisia.fr/fullchain_domain.crt;
+    ssl_certificate_key /home/ubuntu/opcp-ai-powered-store/ssl/hypervisia.fr/privateKey_domain.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -143,8 +143,8 @@ server {
     listen 443 ssl;
     server_name softfluid.fr www.softfluid.fr;
     
-    ssl_certificate /home/ubuntu/ai-swautomorph/ssl/softfluid.fr/fullchain_domain.crt;
-    ssl_certificate_key /home/ubuntu/ai-swautomorph/ssl/softfluid.fr/privateKey_domain.key;
+    ssl_certificate /home/ubuntu/opcp-ai-powered-store/ssl/softfluid.fr/fullchain_domain.crt;
+    ssl_certificate_key /home/ubuntu/opcp-ai-powered-store/ssl/softfluid.fr/privateKey_domain.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
     
@@ -198,7 +198,7 @@ Ensure SSL certificates exist for all configured domains:
 
 ```bash
 # Create directory structure
-mkdir -p /home/ubuntu/ai-swautomorph/ssl/yourdomain.com
+mkdir -p /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com
 
 # Copy certificates
 cp fullchain.crt /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/fullchain_domain.crt
@@ -235,7 +235,7 @@ sudo nginx -t
 sudo systemctl status nginx
 
 # View generated configuration
-cat /etc/nginx/sites-available/ai-swautomorph
+cat /etc/nginx/sites-available/opcp-ai-powered-store
 ```
 
 ## Use Cases
@@ -276,17 +276,17 @@ SECONDARY_DOMAINS=api.example.com:api.example.com:http://localhost:8000,admin.ex
 **Solutions**:
 1. Verify certificate files exist:
    ```bash
-   ls -la /home/ubuntu/ai-swautomorph/ssl/yourdomain.com/
+   ls -la /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/
    ```
 
 2. Check certificate validity:
    ```bash
-   openssl x509 -in /home/ubuntu/ai-swautomorph/ssl/yourdomain.com/fullchain_domain.crt -text -noout
+   openssl x509 -in /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/fullchain_domain.crt -text -noout
    ```
 
 3. Ensure certificate matches domain:
    ```bash
-   openssl x509 -in /home/ubuntu/ai-swautomorph/ssl/yourdomain.com/fullchain_domain.crt -noout -subject
+   openssl x509 -in /home/ubuntu/opcp-ai-powered-store/ssl/yourdomain.com/fullchain_domain.crt -noout -subject
    ```
 
 ### Issue: Nginx Configuration Syntax Error
@@ -301,7 +301,7 @@ SECONDARY_DOMAINS=api.example.com:api.example.com:http://localhost:8000,admin.ex
 
 2. Manually inspect generated configuration:
    ```bash
-   cat /tmp/ai-swautomorph-site
+   cat /tmp/opcp-ai-powered-store-site
    ```
 
 3. Test with minimal configuration first, then add domains incrementally
@@ -347,7 +347,7 @@ SECONDARY_DOMAINS=api.example.com:api.example.com:http://localhost:8000,admin.ex
 
 3. Verify proxy_pass URL in configuration:
    ```bash
-   grep proxy_pass /etc/nginx/sites-available/ai-swautomorph
+   grep proxy_pass /etc/nginx/sites-available/opcp-ai-powered-store
    ```
 
 4. Test backend connectivity from nginx server:
@@ -385,7 +385,7 @@ To add custom location blocks to secondary domains, modify the `create_nginx_con
 
 ```bash
 # After the main location / block for secondary domain
-cat >> /tmp/ai-swautomorph-site << EOF
+cat >> /tmp/opcp-ai-powered-store-site << EOF
     location /api/ {
         proxy_pass ${custom_api_backend};
         # Additional proxy settings
@@ -446,7 +446,7 @@ If issues occur after deployment:
 
 1. **Restore previous nginx configuration**:
    ```bash
-   sudo cp /etc/nginx/sites-available/ai-swautomorph.backup /etc/nginx/sites-available/ai-swautomorph
+   sudo cp /etc/nginx/sites-available/opcp-ai-powered-store.backup /etc/nginx/sites-available/opcp-ai-powered-store
    ```
 
 2. **Test and reload**:
@@ -464,7 +464,7 @@ If issues occur after deployment:
 1. **Always backup** configuration before changes:
    ```bash
    cp conf/deploy.ini conf/deploy.ini.backup
-   sudo cp /etc/nginx/sites-available/ai-swautomorph /etc/nginx/sites-available/ai-swautomorph.backup
+   sudo cp /etc/nginx/sites-available/opcp-ai-powered-store /etc/nginx/sites-available/opcp-ai-powered-store.backup
    ```
 
 2. **Test in staging** environment first

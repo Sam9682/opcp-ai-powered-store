@@ -158,8 +158,8 @@ No additional deployment steps required. The feature is automatically active whe
 ## Configuration
 
 Nginx configuration file location:
-- **Available:** `/etc/nginx/sites-available/ai-swautomorph-dynamic`
-- **Enabled:** `/etc/nginx/sites-enabled/ai-swautomorph-dynamic`
+- **Available:** `/etc/nginx/sites-available/opcp-ai-powered-store-dynamic`
+- **Enabled:** `/etc/nginx/sites-enabled/opcp-ai-powered-store-dynamic`
 
 ## Troubleshooting
 
@@ -170,7 +170,7 @@ sudo nginx -t
 
 ### View current config
 ```bash
-cat /etc/nginx/sites-available/ai-swautomorph-dynamic
+cat /etc/nginx/sites-available/opcp-ai-powered-store-dynamic
 ```
 
 ### Reload nginx

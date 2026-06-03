@@ -9,7 +9,7 @@ from datetime import datetime
 def recover_database():
     """Recover corrupted database by creating a new one"""
     
-    db_path = "/home/ubuntu/ai-swautomorph/softfluid/db/ai_swautomorph.db"
+    db_path = "/home/ubuntu/opcp-ai-powered-store/softfluid/db/ai_swautomorph.db"
     backup_path = f"{db_path}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
     print("Starting database recovery...")
@@ -29,7 +29,7 @@ def recover_database():
     # 3. Initialize new database using the app's init function
     try:
         import sys
-        sys.path.append('/home/ubuntu/ai-swautomorph')
+        sys.path.append('/home/ubuntu/opcp-ai-powered-store')
         from src.database_postgres import init_db
         
         print("Initializing new database...")

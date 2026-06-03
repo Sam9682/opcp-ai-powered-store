@@ -102,7 +102,7 @@ DEPLOYMENT_ID=$(docker exec postgres psql -U $DB_USER -d ai_swautomorph -t -c \
   "SELECT id FROM deployments WHERE user_id = $USER_ID AND application_name = '$NAME_OF_APPLICATION' ORDER BY updated_at DESC LIMIT 1" | xargs)
 
 # Record backup
-python3 /home/ubuntu/ai-swautomorph/scripts/add_backup_to_deployment.py \
+python3 /home/ubuntu/opcp-ai-powered-store/scripts/add_backup_to_deployment.py \
   --deployment-id $DEPLOYMENT_ID \
   --backup-file "$(basename $BACKUP_FILE)" \
   --s3-location "${S3_PATH}$(basename $BACKUP_FILE)" \

@@ -61,7 +61,7 @@ def return_prompt_for_developer(detected_action, application_name, application_f
             if not safe_action:
                 return ''
         
-        context_file = f"/home/ubuntu/ai-swautomorph/shared/{safe_action}_context.md"
+        context_file = f"/home/ubuntu/opcp-ai-powered-store/shared/{safe_action}_context.md"
         
         if os.path.exists(context_file):
             logger.info(f'AI Chat Developer - Loading context from {detected_action.upper()}_context.md')
@@ -127,7 +127,7 @@ def return_prompt_for_operator(detected_action, application_name, application_fo
             logger.warning('AI Chat Operator - Context file not found: invalid action, using default Q&A mode')
             return _create_fallback_prompt(detected_action)
         
-        context_file = f"/home/ubuntu/ai-swautomorph/shared/{safe_action}_context.md"
+        context_file = f"/home/ubuntu/opcp-ai-powered-store/shared/{safe_action}_context.md"
                 
         if os.path.exists(context_file):
             logger.info(f'AI Chat Operator - Loading context from {detected_action.upper()}_context.md')
@@ -303,7 +303,7 @@ def api_request_dev_ai_for_app():
             # Use agentic_command if provided, otherwise use qchat
             if agentic_command:
                 # Execute deployControlPlan.sh with agentic_command
-                cmd_args = ['/home/ubuntu/ai-swautomorph/deployControlPlan.sh', agentic_command]
+                cmd_args = ['/home/ubuntu/opcp-ai-powered-store/deployControlPlan.sh', agentic_command]
                 yield f"data: {json.dumps({'chunk': f'Executing deployControlPlan.sh with command: {agentic_command}'})}\n\n"
 
             elif agentic_engine.lower() == 'shai':
@@ -524,7 +524,7 @@ User Question: {message}. Provide a helpful and informative response."""
             # Use agentic_command if provided, otherwise use qchat
             if agentic_command:
                 # Execute deployControlPlan.sh with agentic_command
-                cmd_args = ['/home/ubuntu/ai-swautomorph/deployControlPlan.sh', agentic_command]
+                cmd_args = ['/home/ubuntu/opcp-ai-powered-store/deployControlPlan.sh', agentic_command]
                 yield f"data: {json.dumps({'chunk': f'Executing deployControlPlan.sh with command: {agentic_command}'})}\n\n"
 
             elif agentic_engine.lower() == 'shai':

@@ -47,7 +47,7 @@ Successfully implemented a new "SPECIFY an AI context" option in the Virtual Age
 ### Existing Code Support
 The backend already supports the SPECIFY action through:
 - `src/routes/genai_routes.py` - `return_prompt_for_developer()` function
-- Automatically loads context file: `/home/ubuntu/ai-swautomorph/shared/SPECIFY_context.md`
+- Automatically loads context file: `/home/ubuntu/opcp-ai-powered-store/shared/SPECIFY_context.md`
 - Replaces template variables with actual values
 - Streams response back to frontend
 
@@ -76,8 +76,8 @@ User Input → JavaScript Handler → POST /api/request_dev_ai_for_app
 
 ### Context File Processing
 ```python
-context_file = f"/home/ubuntu/ai-swautomorph/shared/{safe_action}_context.md"
-# For SPECIFY action: /home/ubuntu/ai-swautomorph/shared/SPECIFY_context.md
+context_file = f"/home/ubuntu/opcp-ai-powered-store/shared/{safe_action}_context.md"
+# For SPECIFY action: /home/ubuntu/opcp-ai-powered-store/shared/SPECIFY_context.md
 ```
 
 ### Template Variables Replaced

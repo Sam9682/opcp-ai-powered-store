@@ -17,7 +17,7 @@ AI-SwAutoMorph is a **centralized application deployment and management platform
 #### 1. 📦 Enhanced Modular Flask Application
 
 ```
-🏠 ai-swautomorph/
+🏠 opcp-ai-powered-store/
 ├── 📁 src/                          # Core application modules
 │   ├── ⚙️ config_postgres.py        # Configuration & multi-language support
 │   ├── 🗄️ database_postgres.py       # PostgreSQL database manager with connection pooling
@@ -222,7 +222,7 @@ AI-SwAutoMorph est une **plateforme centralisée de déploiement et de gestion d
 #### 1. 📦 Application Flask Modulaire Améliorée
 
 ```
-🏠 ai-swautomorph/
+🏠 opcp-ai-powered-store/
 ├── 📁 src/                          # Modules d'application principaux
 │   ├── ⚙️ config_postgres.py        # Configuration et support multi-langues
 │   ├── 🗄️ database_postgres.py       # Gestionnaire de base de données PostgreSQL avec pooling

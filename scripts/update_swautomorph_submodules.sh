@@ -1,6 +1,6 @@
 #!/bin/bash
 
-folders=("ai-beewoo" "ai-checkinatwork" "ai-foodflow" "ai-haccp" "ai-staticwebsite" "ai-transats" "ai-swautomorph")
+folders=("ai-beewoo" "ai-checkinatwork" "ai-foodflow" "ai-haccp" "ai-staticwebsite" "ai-transats" "opcp-ai-powered-store")
 
 for folder in "${folders[@]}"; do
     if [ -d "/home/ubuntu/$folder" ]; then

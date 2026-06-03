@@ -4,7 +4,7 @@
 
 ### Step 1: Generate Sync Secret (Run on ONE server)
 ```bash
-cd /home/ubuntu/ai-swautomorph
+cd /home/ubuntu/opcp-ai-powered-store
 python3 -c "import secrets; print('SYNC_SECRET=' + secrets.token_hex(32))" | tee -a .env
 ```
 

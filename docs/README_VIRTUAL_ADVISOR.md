@@ -105,7 +105,7 @@ Response: [Container logs displayed]
 **No response?**
 - Check network connection
 - Verify application is running
-- Check logs: `tail -f /var/log/ai-swautomorph.log`
+- Check logs: `tail -f /var/log/opcp-ai-powered-store.log`
 
 ## Support
 

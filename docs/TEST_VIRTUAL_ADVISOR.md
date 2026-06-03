@@ -83,7 +83,7 @@ curl -X POST https://localhost:5000/api/qchat_devops \
 ## Logs to Monitor
 ```bash
 # Watch application logs
-tail -f /var/log/ai-swautomorph.log
+tail -f /var/log/opcp-ai-powered-store.log
 
 # Look for these patterns:
 [VIRTUAL ADVISOR] Detected action: START, loading context from...
@@ -94,7 +94,7 @@ tail -f /var/log/ai-swautomorph.log
 ## Troubleshooting
 
 ### Context file not found
-- Verify files exist in `/home/ubuntu/ai-swautomorph/shared/`
+- Verify files exist in `/home/ubuntu/opcp-ai-powered-store/shared/`
 - Check file permissions: `chmod 644 ./shared/*_context.md`
 
 ### Commands not executing

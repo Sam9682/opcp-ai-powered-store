@@ -61,8 +61,8 @@ which python3 && which pip && which docker && which docker-compose
 ### Interactive Deployment (Recommended)
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/ai-swautomorph.git
-cd ai-swautomorph
+git clone https://github.com/your-repo/opcp-ai-powered-store.git
+cd opcp-ai-powered-store
 
 # Interactive deployment with menu selection
 ./deployControlPlan.sh start
@@ -316,7 +316,7 @@ python3 ./scripts/aipoweredstore_cli.py db-health
 
 ### Directory Structure
 ```
-ai-swautomorph/
+opcp-ai-powered-store/
 ├── src/                    # Main application source
 │   ├── routes/            # Flask route blueprints
 │   │   ├── main_routes.py        # Dashboard & documentation
@@ -381,7 +381,7 @@ sudo netstat -tulpn | grep -E ':(80|443|3000|5000)'
 
 # Permission issues
 sudo chown -R ubuntu:ubuntu /home/ubuntu/deployments/
-sudo chown -R ubuntu:ubuntu /home/ubuntu/ai-swautomorph/
+sudo chown -R ubuntu:ubuntu /home/ubuntu/opcp-ai-powered-store/
 
 # Database issues
 python3 ./scripts/aipoweredstore_cli.py db-health
@@ -403,7 +403,7 @@ docker system prune -f
 
 # Complete reset (Local)
 sudo systemctl stop nginx gitea
-sudo rm -rf /etc/nginx/sites-enabled/ai-swautomorph
+sudo rm -rf /etc/nginx/sites-enabled/opcp-ai-powered-store
 rm -rf softfluid/db/ai_swautomorph.db
 
 # Restart deployment

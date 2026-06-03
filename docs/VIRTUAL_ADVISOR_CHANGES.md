@@ -95,13 +95,13 @@ curl -X POST https://localhost:5000/api/qchat_devops \
 
 Run the application and test:
 ```bash
-cd /home/ubuntu/ai-swautomorph
+cd /home/ubuntu/opcp-ai-powered-store
 python3 ControlPlanFlaskApp_postgres.py
 ```
 
 Monitor logs:
 ```bash
-tail -f /var/log/ai-swautomorph.log | grep "VIRTUAL ADVISOR"
+tail -f /var/log/opcp-ai-powered-store.log | grep "VIRTUAL ADVISOR"
 ```
 
 ## Next Steps

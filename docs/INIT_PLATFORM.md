@@ -13,7 +13,7 @@ This document explains how to use `init_pltf.sh` to bootstrap a fresh server for
 | OS          | Ubuntu 22.04+ (tested on OVHcloud VPS/dedicated)           |
 | User        | A non-root user with `sudo` privileges                     |
 | Network     | Internet access (public interface)                         |
-| SSH key     | Configured for `git@github.com:Sam9682/ai-swautomorph.git` |
+| SSH key     | Configured for `git@github.com:Sam9682/opcp-ai-powered-store.git` |
 
 ## What the script installs
 
@@ -78,7 +78,7 @@ Creates `~/.aws/config` and `~/.aws/credentials` with a placeholder profile `OVH
 
 ### 7. Repository clone
 
-Clones the `ai-swautomorph` repository and initializes submodules.
+Clones the `opcp-ai-powered-store` repository and initializes submodules.
 
 ### 8. Python virtual environment
 
@@ -109,8 +109,8 @@ SECONDARY_DOMAINS=other.com:other.com www.other.com:https://yourdomain.com:6137
 Place your SSL files in the `ssl/` directory:
 
 ```
-~/ai-swautomorph/ssl/fullchain_domain.crt    # Full certificate chain
-~/ai-swautomorph/ssl/privateKey_domain.key   # Private key
+~/opcp-ai-powered-store/ssl/fullchain_domain.crt    # Full certificate chain
+~/opcp-ai-powered-store/ssl/privateKey_domain.key   # Private key
 ```
 
 ### Configure S3 credentials

@@ -81,8 +81,8 @@ python3 ./scripts/sync_nginx_locations.py
 
 ## Configuration Files
 
-- **Nginx config:** `/etc/nginx/sites-available/ai-swautomorph-dynamic`
-- **Enabled symlink:** `/etc/nginx/sites-enabled/ai-swautomorph-dynamic`
+- **Nginx config:** `/etc/nginx/sites-available/opcp-ai-powered-store-dynamic`
+- **Enabled symlink:** `/etc/nginx/sites-enabled/opcp-ai-powered-store-dynamic`
 - **Manager module:** `src/nginx_manager.py`
 
 ## Troubleshooting
@@ -94,7 +94,7 @@ sudo nginx -t
 
 ### View current configuration
 ```bash
-cat /etc/nginx/sites-available/ai-swautomorph-dynamic
+cat /etc/nginx/sites-available/opcp-ai-powered-store-dynamic
 ```
 
 ### Reload nginx manually

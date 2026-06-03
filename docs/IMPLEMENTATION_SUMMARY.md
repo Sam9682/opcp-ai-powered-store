@@ -123,7 +123,7 @@ If user doesn't use dropdown, backend still detects from keywords:
 1. **Verify Prerequisites**:
    ```bash
    which qchat  # Ensure AI Chat is installed
-   ls -la /home/ubuntu/ai-swautomorph/shared/*.md  # Verify context files
+   ls -la /home/ubuntu/opcp-ai-powered-store/shared/*.md  # Verify context files
    ```
 
 2. **Test Syntax**:
@@ -134,9 +134,9 @@ If user doesn't use dropdown, backend still detects from keywords:
 
 3. **Restart Application**:
    ```bash
-   cd /home/ubuntu/ai-swautomorph
+   cd /home/ubuntu/opcp-ai-powered-store
    # If using systemd
-   sudo systemctl restart ai-swautomorph
+   sudo systemctl restart opcp-ai-powered-store
    
    # Or if running directly
    python3 ControlPlanFlaskApp_postgres.py
@@ -153,7 +153,7 @@ If user doesn't use dropdown, backend still detects from keywords:
 
 Watch logs for Virtual Advisor activity:
 ```bash
-tail -f /var/log/ai-swautomorph.log | grep "VIRTUAL ADVISOR"
+tail -f /var/log/opcp-ai-powered-store.log | grep "VIRTUAL ADVISOR"
 ```
 
 Look for:
@@ -169,7 +169,7 @@ Look for:
 ### Issue: Context file not found
 **Solution**: Verify files in `./shared/` folder
 ```bash
-ls -la /home/ubuntu/ai-swautomorph/shared/
+ls -la /home/ubuntu/opcp-ai-powered-store/shared/
 ```
 
 ### Issue: Commands not executing
@@ -222,17 +222,17 @@ ls -la /home/ubuntu/ai-swautomorph/shared/
 
 If issues occur:
 ```bash
-cd /home/ubuntu/ai-swautomorph
+cd /home/ubuntu/opcp-ai-powered-store
 git checkout src/automorph_application.py
 git checkout src/routes/api_routes.py
 git checkout templates/dashboard.html
-sudo systemctl restart ai-swautomorph
+sudo systemctl restart opcp-ai-powered-store
 ```
 
 ## Support
 
 For issues or questions:
-1. Check logs: `/var/log/ai-swautomorph.log`
+1. Check logs: `/var/log/opcp-ai-powered-store.log`
 2. Review documentation in this folder
 3. Test with simple PS action first
 4. Verify AI Chat is working: `qchat chat "hello"`

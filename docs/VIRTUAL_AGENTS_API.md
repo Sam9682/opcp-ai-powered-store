@@ -65,7 +65,7 @@ Both agents support:
 - **action_operation** (optional): Specific operation type (defaults to "MODIFY_CODE", validated against allowed operations)
 
 #### 🎯 Enhanced Context Loading
-The agent automatically loads context from `/home/ubuntu/ai-swautomorph/shared/MODIFY_CODE_context.md` which includes:
+The agent automatically loads context from `/home/ubuntu/opcp-ai-powered-store/shared/MODIFY_CODE_context.md` which includes:
 - Application-specific configuration with environment variables
 - User context and permissions with role-based access
 - Git repository information with branch management

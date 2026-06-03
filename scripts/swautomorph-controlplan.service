@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart=/home/ubuntu/ai-swautomorph/scripts/start_swautomorph_controlplan.sh
-ExecStop=/home/ubuntu/ai-swautomorph/scripts/stop_swautomorph_controlplan.sh
-WorkingDirectory=/home/ubuntu/ai-swautomorph
+ExecStart=/home/ubuntu/opcp-ai-powered-store/scripts/start_swautomorph_controlplan.sh
+ExecStop=/home/ubuntu/opcp-ai-powered-store/scripts/stop_swautomorph_controlplan.sh
+WorkingDirectory=/home/ubuntu/opcp-ai-powered-store
 User=ubuntu
 
 [Install]
