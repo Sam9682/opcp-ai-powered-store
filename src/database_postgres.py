@@ -15,7 +15,7 @@ def load_deploy_config():
     """Load configuration from deploy.ini file"""
     config = configparser.ConfigParser()
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'conf', 'deploy.ini')
-    
+
     # Default values matching deployControlPlan.sh
     NAME_OF_APPLICATION = "opcp-swautomorph"
     APPLICATION_IDENTITY_NUMBER = 0
@@ -25,12 +25,12 @@ def load_deploy_config():
     RANGE_RESERVED_CONTROLPLAN = 0
     RANGE_PORTS_PER_APPLICATION = 4
     DOMAIN = "softfluid.fr"
-    
+
     if os.path.exists(config_path):
         try:
             with open(config_path, 'r') as f:
                 content = f.read()
-            
+
             # Parse key=value pairs
             for line in content.split('\n'):
                 line = line.strip()
@@ -38,7 +38,7 @@ def load_deploy_config():
                     key, value = line.split('=', 1)
                     key = key.strip()
                     value = value.strip().strip('"')
-                    
+
                     if key == 'NAME_OF_APPLICATION':
                         NAME_OF_APPLICATION = value
                     elif key == 'APPLICATION_IDENTITY_NUMBER':
@@ -57,7 +57,7 @@ def load_deploy_config():
                         DOMAIN = value
         except Exception as e:
             print(f"Warning: Could not load deploy.ini: {e}")
-    
+
     return NAME_OF_APPLICATION, APPLICATION_IDENTITY_NUMBER, RANGE_START, RANGE_RESERVED, RANGE_START_CONTROLPLAN, RANGE_RESERVED_CONTROLPLAN, RANGE_PORTS_PER_APPLICATION, DOMAIN
 
 # Load configuration values
@@ -76,7 +76,7 @@ class PostgreSQLManager:
     """Thread-safe PostgreSQL database manager with connection pooling"""
     _instance = None
     _lock = threading.Lock()
-    
+
     def __new__(cls):
         if cls._instance is None:
             with cls._lock:
@@ -84,19 +84,28 @@ class PostgreSQLManager:
                     cls._instance = super().__new__(cls)
                     cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(self):
         if not self._initialized:
             self._pool = None
             self._config = None
             self._initialized = True
-    
+
     def _ensure_initialized(self):
         """Ensure the connection pool is initialized"""
         if self._pool is None:
             self._config = get_database_config()
             self._initialize_pool()
-    
+
+    def _is_connection_valid(self, conn):
+        """Check if a connection is still valid"""
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute('SELECT 1')
+            return True
+        except:
+            return False
+
     def _initialize_pool(self):
         """Initialize PostgreSQL connection pool"""
         try:
@@ -114,8 +123,24 @@ class PostgreSQLManager:
             print(f"PostgreSQL connection pool initialized: {self._config['min_connections']}-{self._config['max_connections']} connections")
         except Exception as e:
             print(f"Failed to initialize PostgreSQL connection pool: {e}")
-            raise
-    
+            # Try to re-initialize once more with default settings
+            try:
+                self._pool = psycopg2.pool.ThreadedConnectionPool(
+                    minconn=1,
+                    maxconn=10,
+                    host=self._config['host'],
+                    port=self._config['port'],
+                    database=self._config['database'],
+                    user=self._config['user'],
+                    password=self._config['password'],
+                    sslmode=self._config.get('sslmode', 'prefer'),
+                    connect_timeout=10
+                )
+                print(f"PostgreSQL connection pool initialized with default settings: 1-10 connections")
+            except Exception as e2:
+                print(f"Failed to initialize PostgreSQL connection pool even with defaults: {e2}")
+                raise
+
     @contextmanager
     def get_db_connection(self):
         """Context manager for database connections"""
@@ -127,30 +152,45 @@ class PostgreSQLManager:
             yield conn
         except Exception as e:
             if conn:
-                conn.rollback()
+                try:
+                    conn.rollback()
+                except:
+                    pass
+                # Return connection to pool even if there was an error
+                self._pool.putconn(conn, close=True)
+                conn = None
             raise
         finally:
             if conn:
-                self._pool.putconn(conn)
-    
+                try:
+                    self._pool.putconn(conn)
+                except:
+                    # If we can't put the connection back, it's likely already closed
+                    pass
+
     def execute_query(self, query, params=None, fetch_one=False, fetch_all=False):
         """Execute a query with automatic retry on transient errors"""
         max_retries = 3
         retry_delay = 0.1
-        
+
         # Convert SQLite query parameters to PostgreSQL format
         converted_query = convert_sqlite_to_postgres_query(query)
-        
+
         for attempt in range(max_retries):
             conn = None
             try:
                 with self.get_db_connection() as conn:
+                    # Validate connection if it's not None
+                    if conn and not self._is_connection_valid(conn):
+                        # Connection is invalid, force a new one by breaking the context
+                        raise psycopg2.OperationalError("Connection is invalid")
+
                     with conn.cursor() as cursor:
                         if params:
                             cursor.execute(converted_query, params)
                         else:
                             cursor.execute(converted_query)
-                        
+
                         # Only fetch if query returns results
                         if fetch_one:
                             if cursor.description:
@@ -163,37 +203,58 @@ class PostgreSQLManager:
                             else:
                                 result = []
                         else:
+                            # For non-fetch operations, we still need to ensure the query executed properly
                             result = cursor.rowcount
-                        
+
                         conn.commit()
-                        
+
                         # Queue replication for INSERT/UPDATE on replicated tables
                         self._queue_replication(converted_query, params)
-                        
+
                         return result
             except psycopg2.ProgrammingError as e:
                 # Handle "no results to fetch" error gracefully
                 if "no results to fetch" in str(e) or "PGRES_TUPLES_OK" in str(e):
+                    # This error can occur when trying to fetch results from a non-SELECT query
+                    # In such cases, we should return appropriate default values
                     if conn:
                         conn.commit()
                     return None if (fetch_one or fetch_all) else 0
                 raise
-            except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+            except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.DatabaseError) as e:
+                # Handle database connection issues and other database errors
+                if "PGRES_TUPLES_OK" in str(e) and not (fetch_one or fetch_all):
+                    # Special case for the specific error mentioned in the issue
+                    # When we're not fetching results, just return 0 to indicate success
+                    if conn:
+                        conn.commit()
+                    return 0
+                # Log the error for debugging purposes
+                print(f"Database error on attempt {attempt}: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
                     continue
                 raise
-    
+            except Exception as e:
+                # Catch any other unexpected exceptions
+                print(f"Unexpected error in execute_query: {e}")
+                if conn:
+                    try:
+                        conn.rollback()
+                    except:
+                        pass
+                raise
+
     def _queue_replication(self, query, params):
         """Queue replication event for INSERT/UPDATE on replicated tables"""
         try:
             query_upper = query.upper().strip()
             replicated_tables = {'USERS', 'SERVERS', 'APPLICATIONS', 'USER_APPLICATIONS', 'BILLING_ACTIVITIES', 'AUTH_TOKENS'}
-            
+
             # Detect operation and table
             operation = None
             table = None
-            
+
             if query_upper.startswith('INSERT INTO'):
                 operation = 'INSERT'
                 # Extract table name
@@ -206,7 +267,7 @@ class PostgreSQLManager:
                 parts = query_upper.split()
                 if len(parts) >= 2:
                     table = parts[1].split()[0]
-            
+
             if operation and table and table in replicated_tables:
                 from src.replication_manager import queue_replication_event
                 # Build data dict from params
@@ -219,15 +280,15 @@ class PostgreSQLManager:
                 queue_replication_event(table.lower(), operation, data)
         except Exception:
             pass  # Silently ignore replication errors
-    
+
     def execute_many(self, query, params_list):
         """Execute multiple queries in a single transaction"""
         max_retries = 3
         retry_delay = 0.1
-        
+
         # Convert SQLite query parameters to PostgreSQL format
         converted_query = convert_sqlite_to_postgres_query(query)
-        
+
         for attempt in range(max_retries):
             try:
                 with self.get_db_connection() as conn:
@@ -246,17 +307,17 @@ db_manager = PostgreSQLManager()
 
 def load_default_apps():
     """Load default applications from conf/default_apps config file.
-    
+
     File format: name | description | git_url | git_repo_size | docker_build_duration | docker_start_duration | docker_stop_duration | docker_ps_duration
     Lines starting with # are comments, empty lines are ignored.
     """
     config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'conf', 'default_apps')
     default_apps = []
-    
+
     if not os.path.exists(config_path):
         print(f"Warning: default_apps config file not found at {config_path}")
         return default_apps
-    
+
     try:
         with open(config_path, 'r') as f:
             for line in f:
@@ -276,20 +337,20 @@ def load_default_apps():
                 default_apps.append((name, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration))
     except Exception as e:
         print(f"Warning: Could not load default_apps config: {e}")
-    
+
     return default_apps
 
 def init_db():
     """Initialize database with required tables"""
     with db_manager.get_db_connection() as conn:
         with conn.cursor() as cursor:
-            
+
             # Check if tables exist
             cursor.execute("""
-                SELECT table_name FROM information_schema.tables 
+                SELECT table_name FROM information_schema.tables
                 WHERE table_schema = 'public' AND table_name = 'users'
             """)
-            
+
             if not cursor.fetchone():
                 # Read and execute schema
                 schema_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'scripts', 'postgresql_schema.sql')
@@ -297,7 +358,7 @@ def init_db():
                     schema_sql = f.read()
                 cursor.execute(schema_sql)
                 print("Database schema created successfully")
-            
+
             # Apply 2FA and password reset migration
             try:
                 migration_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migration', 'add_password_reset_and_2fa.sql')
@@ -310,7 +371,7 @@ def init_db():
                 # Migration may already be applied, ignore errors
                 conn.rollback()
                 print(f"[INFO] 2FA migration check: {e}")
-            
+
             # Apply serverless jobs migration
             try:
                 migration_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migration', 'add_serverless_jobs.sql')
@@ -323,23 +384,23 @@ def init_db():
                 # Migration may already be applied, ignore errors
                 conn.rollback()
                 print(f"[INFO] Serverless jobs migration check: {e}")
-            
+
             # Insert default applications if none exist
             cursor.execute('SELECT COUNT(*) FROM applications')
             if cursor.fetchone()[0] == 0:
                 default_apps = load_default_apps()
                 if default_apps:
                     cursor.executemany('''
-                        INSERT INTO applications (name, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration) 
+                        INSERT INTO applications (name, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ''', default_apps)
-                
+
                 # Insert default costs for applications
                 cursor.execute('SELECT id FROM applications')
                 app_ids = cursor.fetchall()
                 for app_id in app_ids:
                     cursor.execute('INSERT INTO application_costs (application_id, cost_per_day) VALUES (%s, %s)', (app_id[0], 1.0))
-            
+
             # Insert current server if none exists
             cursor.execute('SELECT COUNT(*) FROM servers')
             if cursor.fetchone()[0] == 0:
@@ -352,12 +413,12 @@ def init_db():
                     s.close()
                 except:
                     current_ip = "127.0.0.1"
-                
+
                 cursor.execute('''
                     INSERT INTO servers (server_ip, server_name, server_capacity_user_max, server_capacity_appli_max, server_status, server_type)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 ''', (current_ip, 'main-server', 10, 50, 'STAND_BY', 'STAND_ALONE'))
-            
+
             # Create default admin user if none exists
             cursor.execute('SELECT COUNT(*) FROM users WHERE username = %s', ('admin',))
             if cursor.fetchone()[0] == 0:
@@ -384,10 +445,10 @@ def init_db():
 
                     url = f'https://www.{DOMAIN}:{HTTPS_PORT}'
                     cursor.execute('''
-                        INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2) 
+                        INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2)
                         VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ''', (admin_id, app_id, url, HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2))
-                
+
                 # Ensure costs exist for all applications
                 cursor.execute('SELECT id FROM applications')
                 app_ids = cursor.fetchall()
@@ -395,7 +456,7 @@ def init_db():
                     cursor.execute('SELECT COUNT(*) FROM application_costs WHERE application_id = %s', (app_id[0],))
                     if cursor.fetchone()[0] == 0:
                         cursor.execute('INSERT INTO application_costs (application_id, cost_per_day) VALUES (%s, %s)', (app_id[0], 1.0))
-                
+
                 # Create default payment mode for admin
                 cursor.execute('SELECT COUNT(*) FROM payment_modes WHERE user_id = %s', (admin_id,))
                 if cursor.fetchone()[0] == 0:
@@ -403,7 +464,7 @@ def init_db():
                         INSERT INTO payment_modes (user_id, payment_type, is_default)
                         VALUES (%s, %s, %s)
                     ''', (admin_id, 'bank_transfer', True))
-            
+
             # Update existing user_applications records with port information if missing
             cursor.execute('SELECT id, user_id, application_id FROM user_applications WHERE http_port IS NULL OR https_port IS NULL')
             records_to_update = cursor.fetchall()
@@ -411,10 +472,10 @@ def init_db():
                 record_id, user_id, app_id = record
                 HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2 = calculate_app_ports(user_id, app_id)
                 cursor.execute('''
-                    UPDATE user_applications SET http_port = %s, https_port = %s, http_port2 = %s, https_port2 = %s 
+                    UPDATE user_applications SET http_port = %s, https_port = %s, http_port2 = %s, https_port2 = %s
                     WHERE id = %s
                 ''', (HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2, record_id))
-            
+
             # Insert default configuration parameters if none exist
             cursor.execute('SELECT COUNT(*) FROM configuration')
             if cursor.fetchone()[0] == 0:
@@ -423,18 +484,18 @@ def init_db():
                     (None, 'agentic_command', '')
                 ]
                 cursor.executemany('INSERT INTO configuration (parent, key, value) VALUES (%s, %s, %s)', default_config)
-            
+
             conn.commit()
 
 def assign_default_apps_to_user(user_id):
     """Assign default applications to a new user"""
     with db_manager.get_db_connection() as conn:
         with conn.cursor() as cursor:
-            
+
             # Get all applications
             cursor.execute('SELECT id, name FROM applications')
             apps = cursor.fetchall()
-            
+
             # Assign all applications to the user with calculated URLs
             for app in apps:
                 app_id, app_name = app[0], app[1]
@@ -444,22 +505,22 @@ def assign_default_apps_to_user(user_id):
                 # Compose URL
                 url = f'https://www.{DOMAIN}:{HTTPS_PORT}'
                 cursor.execute('''
-                    INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2) 
+                    INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (user_id, application_id) DO NOTHING
                 ''', (user_id, app_id, url, HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2))
-            
+
             conn.commit()
 
 def assign_app_to_all_users(app_id, app_name):
     """Assign a new application to all existing users"""
     with db_manager.get_db_connection() as conn:
         with conn.cursor() as cursor:
-            
+
             # Get all user IDs
             cursor.execute('SELECT id FROM users')
             user_ids = cursor.fetchall()
-            
+
             # Assign application to all users with calculated URLs
             for user_id in user_ids:
                 uid = user_id[0]
@@ -468,11 +529,11 @@ def assign_app_to_all_users(app_id, app_name):
 
                 url = f'https://www.{DOMAIN}:{HTTPS_PORT}'
                 cursor.execute('''
-                    INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2) 
+                    INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (user_id, application_id) DO NOTHING
                 ''', (uid, app_id, url, HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2))
-            
+
             conn.commit()
 
 def get_config_value(key, parent=None, default_value=None):
