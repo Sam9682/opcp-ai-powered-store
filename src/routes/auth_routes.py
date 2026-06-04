@@ -6,6 +6,7 @@ from ..auth import generate_sso_token, invalidate_sso_token, validate_sso_token
 
 # Use PostgreSQL by default
 from ..database_postgres import db_manager
+from ..config_postgres import DOMAIN, PLTF_NAME, APP_VERSION
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -45,7 +46,7 @@ def register():
                 return jsonify({'error': 'Username or email already exists'}), 409
             return jsonify({'error': f'Database error: {str(e)}'}), 500
     
-    return render_template('register.html')
+    return render_template('register.html', DOMAIN=DOMAIN, PLTF_NAME=PLTF_NAME, APP_VERSION=APP_VERSION)
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
