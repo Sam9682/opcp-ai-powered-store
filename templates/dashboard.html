@@ -2622,6 +2622,14 @@ function updateApplicationButtonStatus(appName, logs) {
     if (applicationStatus === 'is_not_cloned') {
         // Keep app card visible in main panel but hide from virtual agent dropdown
         appCard.style.display = '';
+        appCard.style.backgroundColor = '';
+        
+        // Reset action buttons background
+        const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
+        if (actionButtonsDiv) {
+            actionButtonsDiv.style.backgroundColor = '';
+            actionButtonsDiv.style.padding = '';
+        }
         
         // Remove from virtual agent dropdown only
         const virtualAgentOption = document.getElementById(`virtualAgent-${appName.replace(/\s+/g, '-').toLowerCase()}`);
@@ -2693,6 +2701,12 @@ function updateApplicationButtonStatus(appName, logs) {
         
         if (isRunning) {
             // Application is running
+            appCard.style.backgroundColor = '';
+            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
+            if (actionButtonsDiv) {
+                actionButtonsDiv.style.backgroundColor = '';
+                actionButtonsDiv.style.padding = '';
+            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-danger');
                 openBtn.classList.add('btn-success');
@@ -2718,6 +2732,13 @@ function updateApplicationButtonStatus(appName, logs) {
 
         } else if (isNotRunning) {
             // Application is cloned but not running
+            appCard.style.backgroundColor = '#f8d7da';
+            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
+            if (actionButtonsDiv) {
+                actionButtonsDiv.style.backgroundColor = '';
+                actionButtonsDiv.style.borderRadius = '';
+                actionButtonsDiv.style.padding = '';
+            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-success', 'btn-secondary');
                 openBtn.classList.add('btn-danger');
@@ -2751,6 +2772,12 @@ function updateApplicationButtonStatus(appName, logs) {
 
         } else if (isClonedButNotCompliant) {
             // Application is cloned but deployApp.sh is missing (not compliant)
+            appCard.style.backgroundColor = '';
+            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
+            if (actionButtonsDiv) {
+                actionButtonsDiv.style.backgroundColor = '';
+                actionButtonsDiv.style.padding = '';
+            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-success', 'btn-danger');
                 openBtn.classList.add('btn-warning');
