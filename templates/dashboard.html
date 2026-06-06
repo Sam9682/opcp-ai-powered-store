@@ -3,7 +3,7 @@
 {% block title %}{{ get_text('dashboard') }} - {{ PLTF_NAME }}{% endblock %}
 
 {% block content %}
-<div class="dashboard-layout">
+<div class="dashboard-layout vertical">
     <div class="main-panel">
         <div class="dashboard-container">
 
@@ -877,10 +877,6 @@
     <!-- Virtual Agents Panel -->
     <div class="agents-panel" id="agentsPanel">
         <div id="virtualAgentsPanel" class="virtual-agents-panel" style="background-color: rgb(177, 177, 177);">
-            <div class="panel-header">
-                <h3>🤖 {{ get_text('virtual_agents') }}</h3>
-                <button id="togglePanel" class="toggle-btn" onclick="toggleAgentsPanel()">−</button>
-            </div>
             
             <div class="panel-content">
                 <!-- Unified Agent Area -->
@@ -900,6 +896,7 @@
                             <option value="LOGS">{{ get_text('display_logs_option') }}</option>
                             <option value="PS">{{ get_text('display_ps_option') }}</option>
                         </select>
+                        <button id="togglePanel" class="toggle-btn" onclick="toggleAgentsPanel()" title="Toggle panel">−</button>
                     </div>
                         <!-- Persistent message container -->
                         <div class="message operations-assistant" id="persistentMessageContainer" style="width: 100%; height: 100%;">
