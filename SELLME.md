@@ -8,29 +8,30 @@
 
 Your customers are building AI workloads. They need GPU compute, but:
 
+- Teams need to deploy Containers, Serverless or AI applications fast, without DevOps overhead
 - A single NVIDIA H100 costs **€30k+** — most workloads don't need the full card
 - GPU utilization sits at **15-30%** on average across data centers
 - Customers want isolated GPU access without managing bare-metal infrastructure
-- Teams need to deploy AI applications fast, without DevOps overhead
+
 
 ---
 
-## The Solution: OPCP AI-Powered Store
+## The Solution: OPCP AI-Powered Store for OPCP Core Baremetal Platform
 
 A turnkey platform that lets your OCPC customers **deploy, manage, and share GPU resources** through a single interface — Web, CLI, API, or AI agents.
 
-### One Platform, Four Access Modes
+### One OPCP Platform, Four Access Modes
 
-| Mode | Use Case |
-|------|----------|
-| **Web Dashboard** | Visual management for administrators |
-| **REST API** | Integration into CI/CD and automation pipelines |
-| **CLI** | DevOps and scripting workflows |
-| **MCP (AI Agents)** | Autonomous deployment by GenAI agents |
+|        Mode         |                 Use Case                        |
+|---------------------|-------------------------------------------------|
+| **Web Dashboard**   | Visual management for administrators            |
+| **REST API**        | Integration into CI/CD and automation pipelines |
+| **CLI**             | DevOps and scripting workflows                  |
+| **MCP (AI Agents)** | Autonomous deployment by GenAI agents           |
 
 ---
 
-## Key Selling Point: Shared GPU via Docker
+## Key Features: Docker/Podman, Serverless and Shared GPU via Docker on OPCP Baremetal
 
 ### NVIDIA MIG — GPU Partitioning Made Simple
 
@@ -70,15 +71,15 @@ docker run --gpus '"device=MIG-xxx"' my-ai-model:latest
 
 ### For the Sales Conversation
 
-| Customer Pain | OPCP Answer | OVH Value |
-|---------------|-------------|-----------|
-| "GPUs are too expensive for our team" | MIG partitioning — share one H100 across 7 workloads | Upsell bare-metal GPU with higher utilization |
-| "We need isolated GPU for each tenant" | Hardware-level isolation via MIG instances | Differentiation vs. basic VM-based GPU sharing |
-| "Our AI team can't wait for IT to provision" | Self-service web UI + API for instant GPU access | Reduced support tickets, faster adoption |
-| "We want serverless GPU jobs" | Serverless Docker execution with GPU passthrough | New billing model: pay-per-job |
-| "We need AI agents to deploy autonomously" | MCP protocol + REST API for GenAI automation | Future-proof positioning in AI infrastructure |
+|                 Customer Pain                |                        OPCP Answer                                         |                      OVH Value                       |
+|----------------------------------------------|------------------------------------------------------|-----------------------------------------------|
+| "Our AI team can't wait for IT to provision" | Self-service web UI + API for instant GPU access     | Reduced support tickets, faster adoption               |
+| "We need AI agents to deploy autonomously"   | MCP protocol + REST API for GenAI automation         | Future-proof positioning in AI infrastructure  |
+| "GPUs are too expensive for our team"        | MIG partitioning — share one H100 across 7 workloads | Upsell bare-metal GPU with higher utilization         |
+| "We need isolated GPU for each tenant"       | Hardware-level isolation via MIG instances           | Differentiation vs. basic VM-based GPU sharing |
+| "We want serverless GPU jobs"                | Serverless Docker execution with GPU passthrough     | New billing model: pay-per-job                     |
 
-### Revenue Opportunities
+### Increase Usage Opportunities
 
 1. **GPU Compute Upsell**: Customers who partition GPUs will consume more GPU hours overall
 2. **Professional Services Engagement**: Platform setup, customization, and training
@@ -89,21 +90,21 @@ docker run --gpus '"device=MIG-xxx"' my-ai-model:latest
 
 ## Platform Capabilities at a Glance
 
-| Capability | Description |
-|-----------|-------------|
-| 🎮 **MIG Shared GPU** | Partition NVIDIA GPUs into isolated instances per server |
-| ⚡ **Serverless Docker** | Submit Docker jobs on-demand, GPU-accelerated |
-| 🚀 **App Deployment** | Clone, build, start, stop, monitor — full lifecycle |
-| 🤖 **AI Agent Support** | MCP protocol for autonomous GenAI deployment |
-| 🔐 **Multi-tenant Auth** | SSO, 2FA, role-based access, per-user isolation |
-| 🌐 **Multi-server** | Capacity-based server allocation with replication |
-| 💰 **Billing** | Activity tracking, cost attribution, usage reports |
-| 🛡️ **Security** | ModSecurity WAF, OWASP CRS, input validation |
-| 📊 **Monitoring** | Health checks, real-time logs, database statistics |
+|        Capability         |                    Description                          |
+|---------------------------|---------------------------------------------------------|
+| ⚡ **Serverless Docker** | Submit Docker jobs on-demand, GPU-accelerated            |
+| 🚀 **App Deployment**    | Clone, build, start, stop, monitor — full lifecycle      |
+| 🤖 **AI Agent Support**  | MCP protocol for autonomous GenAI deployment             |
+| 🎮 **MIG Shared GPU**    | Partition NVIDIA GPUs into isolated instances per server |
+| 🔐 **Multi-tenant Auth** | SSO, 2FA, role-based access, per-user isolation          |
+| 🌐 **Multi-server**      | Capacity-based server allocation with replication        |
+| 💰 **Billing**           | Activity tracking, cost attribution, usage reports       |
+| 🛡️ **Security**          | ModSecurity WAF, OWASP CRS, input validation             |
+| 📊 **Monitoring**        | Health checks, real-time logs, database statistics       |
 
 ---
 
-## Demo Scenario (5 minutes)
+## Demo Scenario (15 minutes)
 
 1. **Show the dashboard** — Server list with "Shared-GPU" button
 2. **Enable MIG** on a server — Toggle switch, watch MIG mode activate via SSH

@@ -24,13 +24,24 @@ AI-SwAutoMorph is a **centralized application deployment and management platform
 │   ├── 🗄️ database.py               # Legacy SQLite database manager (migration compatibility)
 │   ├── 🔐 auth.py                   # Authentication & SSO management
 │   ├── 🌐 ControlPlanFlaskApp_postgres.py    # Flask application factory
+│   ├── 🎭 orchestrator.py           # Application lifecycle orchestration
+│   ├── 🔄 replication_manager.py    # Peer-to-peer database replication
+│   ├── 🌐 platform_discovery.py     # Platform capability discovery
+│   ├── 📁 serverless/              # Serverless execution engine
+│   │   ├── config.py               # Serverless configuration
+│   │   └── worker.py               # Job worker process
 │   └── 📁 routes/                   # Route handlers (blueprints)
 │       ├── 🏠 main_routes.py        # Dashboard & documentation viewer
 │       ├── 👤 auth_routes.py        # User authentication
 │       ├── 🔑 sso_routes.py         # Single Sign-On functionality
 │       ├── 🔌 api_routes.py         # REST API with streaming support
 │       ├── 🤖 genai_routes.py       # Virtual AI agents with streaming
-│       └── 💰 billing_routes.py     # Billing and cost management
+│       ├── 💰 billing_routes.py     # Billing and cost management
+│       ├── 🎭 orchestrator_routes.py # Application lifecycle orchestration
+│       ├── 🔄 replication_routes.py # Multi-server replication sync
+│       ├── 🔒 security_routes.py   # Password reset & 2FA
+│       ├── ⚡ serverless_routes.py  # Serverless Docker job execution
+│       └── 🎮 gpu_routes.py         # MIG shared GPU management
 ├── 📁 templates/                    # HTML templates with EN/FR support
 │   ├── 🎨 base.html                 # Base template with navbar language switching
 │   ├── 📊 dashboard.html            # Main dashboard with unified virtual agents
@@ -45,6 +56,11 @@ AI-SwAutoMorph is a **centralized application deployment and management platform
 ├── 📁 scripts/                      # CLI tools and utilities
 │   ├── 💻 aipoweredstore_cli.py                    # Command-line interface
 │   └── 🔌 mcp_server.py             # Model Context Protocol server
+├── 📁 migration/                    # Database migration scripts
+│   ├── add_serverless_jobs.sql      # Serverless job queue schema
+│   ├── add_mig_gpu.sql             # MIG GPU tables
+│   └── add_password_reset_and_2fa.sql # Security features
+├── 📁 tests/                        # Automated test suite (pytest)
 ├── 📁 shared/                       # Context files for virtual agents
 │   ├── 📝 MODIFY_CODE_context.md    # Developer agent context
 │   ├── ▶️ START_context.md          # Start operation context
@@ -52,6 +68,7 @@ AI-SwAutoMorph is a **centralized application deployment and management platform
 │   ├── 🔄 RESTART_context.md        # Restart operation context
 │   ├── 🔍 PS_context.md             # Process status context
 │   └── 📄 LOGS_context.md           # Log analysis context
+├── 🖥️ init_pltf.sh                  # Platform initialization (Docker, NVIDIA, MIG)
 └── 🚀 deployControlPlan.sh          # Main deployment control script
 ```
 
@@ -141,13 +158,17 @@ The platform provides **two specialized AI agents** with advanced features:
 📱 Applications: id, name, description, git_url, git_repo_size, docker_*_duration, created_at
 🔗 User_Applications: id, user_id, application_id, url, http_port, https_port, http_port2, https_port2, created_at
 🚀 Deployments: id, user_id, application_name, status, deployment_path, git_url, server_id, created_at, updated_at
-🖥️ Servers: id, SERVER_IP, SERVER_NAME, SERVER_CAPACITY_USER_MAX, SERVER_CAPACITY_APPLI_MAX, SERVER_STATUS, SERVER_TYPE, created_at
+🖥️ Servers: id, SERVER_IP, SERVER_NAME, SERVER_CAPACITY_USER_MAX, SERVER_CAPACITY_APPLI_MAX, SERVER_STATUS, SERVER_TYPE, shared_gpu_enabled, created_at
 🔑 Auth_Tokens: id, user_id, token_hash, expires_at, created_at
 💰 Application_Costs: id, application_id, cost_per_day, created_at, updated_at
 📊 Billing_Activities: id, user_id, application_id, action, started_at, stopped_at, duration_seconds, cost_amount, created_at
 📝 Users_Logs: id, user_id, username, action, datetime
 💳 Payment_Modes: id, user_id, payment_type, bank_account, paypal_email, card_last_four, card_type, is_default, created_at
 🧾 Invoicing: id, user_id, invoice_month, total_amount, status, payment_date, payment_mode_id, created_at
+🎮 MIG_Profiles: id, server_id, profile_name, profile_id, gpu_memory_gb, created_at
+🖥️ MIG_Instances: id, server_id, instance_uuid, profile_name, gpu_memory_mb, created_at
+⚡ Serverless_Jobs: id, user_id, image, command, env, timeout, status, worker_id, stdout, stderr, exit_code, created_at, started_at, completed_at
+🔒 Password_Reset_Tokens: id, user_id, token_hash, expires_at, created_at
 ```
 
 **Enhanced Database Features**:
@@ -203,6 +224,41 @@ The platform provides **two specialized AI agents** with advanced features:
 - 📝 Comprehensive logging for security monitoring
 - ⏱️ Process timeout management with graceful cleanup
 
+#### 8. 🎮 MIG Shared GPU Management
+
+**GPU Features**:
+- 🖥️ **NVIDIA MIG Partitioning**: Split a single GPU into up to 7 isolated instances
+- 🔧 **Per-Server Configuration**: Enable/disable shared GPU per server via web UI or API
+- 📡 **SSH-based Management**: Remote GPU commands via subprocess SSH execution
+- 🐳 **Docker GPU Access**: Each MIG instance accessible via `--gpus` flag in containers
+- 🔒 **Admin-Only Access**: All GPU endpoints enforce admin authentication
+- 📊 **Instance Tracking**: Database persistence of MIG profiles and active instances
+
+**API Endpoints** (`/api/servers/<server_id>/gpu`):
+- `PUT /enabled` — Toggle shared GPU (enables MIG mode via SSH on activation)
+- `GET /profiles` — List available MIG partition profiles from GPU hardware
+- `GET /instances` — List active MIG instances from database
+- `POST /instances` — Create MIG instances from profile IDs (1-7)
+- `DELETE /instances` — Destroy all MIG instances on server
+
+#### 9. ⚡ Serverless Docker Execution
+
+**Serverless Features**:
+- 🐳 **On-Demand Containers**: Submit Docker jobs without managing infrastructure
+- 🔒 **Security Hardening**: Read-only filesystem, no network, dropped capabilities
+- ⏱️ **Timeout Enforcement**: Configurable per-job timeouts with graceful termination
+- 📊 **Job Queue**: PostgreSQL-backed with `FOR UPDATE SKIP LOCKED` for concurrent workers
+- 📈 **Horizontal Scaling**: Multiple workers can run concurrently
+- 🧹 **Automatic Cleanup**: Old logs and jobs cleaned up based on retention policy
+
+**API Endpoints** (`/api/jobs`):
+- `POST /jobs` — Submit a new Docker job
+- `GET /jobs` — List user jobs with pagination and filtering
+- `GET /jobs/<id>` — Get job status and metadata
+- `GET /jobs/<id>/result` — Get stdout/stderr and exit code
+- `POST /jobs/<id>/cancel` — Cancel pending or running job
+- `GET /jobs/metrics` — Aggregated job statistics (admin)
+
 ---
 
 ## Français
@@ -229,13 +285,24 @@ AI-SwAutoMorph est une **plateforme centralisée de déploiement et de gestion d
 │   ├── 🗄️ database.py               # Gestionnaire de base de données SQLite (compatibilité migration)
 │   ├── 🔐 auth.py                   # Authentification et gestion SSO
 │   ├── 🌐 ControlPlanFlaskApp_postgres.py    # Factory d'application Flask
+│   ├── 🎭 orchestrator.py           # Application lifecycle orchestration
+│   ├── 🔄 replication_manager.py    # Peer-to-peer database replication
+│   ├── 🌐 platform_discovery.py     # Platform capability discovery
+│   ├── 📁 serverless/              # Serverless execution engine
+│   │   ├── config.py               # Serverless configuration
+│   │   └── worker.py               # Job worker process
 │   └── 📁 routes/                   # Gestionnaires de routes (blueprints)
 │       ├── 🏠 main_routes.py        # Tableau de bord et visualiseur de documentation
 │       ├── 👤 auth_routes.py        # Authentification utilisateur
 │       ├── 🔑 sso_routes.py         # Fonctionnalité Single Sign-On
 │       ├── 🔌 api_routes.py         # API REST avec support streaming
 │       ├── 🤖 genai_routes.py       # Agents IA virtuels avec streaming
-│       └── 💰 billing_routes.py     # Facturation et gestion des coûts
+│       ├── 💰 billing_routes.py     # Facturation et gestion des coûts
+│       ├── 🎭 orchestrator_routes.py # Application lifecycle orchestration
+│       ├── 🔄 replication_routes.py # Multi-server replication sync
+│       ├── 🔒 security_routes.py   # Password reset & 2FA
+│       ├── ⚡ serverless_routes.py  # Serverless Docker job execution
+│       └── 🎮 gpu_routes.py         # MIG shared GPU management
 ├── 📁 templates/                    # Modèles HTML avec support EN/FR
 │   ├── 🎨 base.html                 # Modèle de base avec changement de langue navbar
 │   ├── 📊 dashboard.html            # Tableau de bord principal avec agents virtuels unifiés
@@ -250,6 +317,11 @@ AI-SwAutoMorph est une **plateforme centralisée de déploiement et de gestion d
 ├── 📁 scripts/                      # Outils CLI et utilitaires
 │   ├── 💻 aipoweredstore_cli.py                    # Interface en ligne de commande
 │   └── 🔌 mcp_server.py             # Serveur Model Context Protocol
+├── 📁 migration/                    # Database migration scripts
+│   ├── add_serverless_jobs.sql      # Serverless job queue schema
+│   ├── add_mig_gpu.sql             # MIG GPU tables
+│   └── add_password_reset_and_2fa.sql # Security features
+├── 📁 tests/                        # Automated test suite (pytest)
 ├── 📁 shared/                       # Fichiers de contexte pour agents virtuels
 │   ├── 📝 MODIFY_CODE_context.md    # Contexte agent développeur
 │   ├── ▶️ START_context.md          # Contexte opération start
@@ -257,6 +329,7 @@ AI-SwAutoMorph est une **plateforme centralisée de déploiement et de gestion d
 │   ├── 🔄 RESTART_context.md        # Contexte opération restart
 │   ├── 🔍 PS_context.md             # Contexte statut processus
 │   └── 📄 LOGS_context.md           # Contexte analyse logs
+├── 🖥️ init_pltf.sh                  # Platform initialization (Docker, NVIDIA, MIG)
 └── 🚀 deployControlPlan.sh          # Script principal de contrôle de déploiement
 ```
 
@@ -303,13 +376,17 @@ La plateforme fournit **deux agents IA spécialisés** avec fonctionnalités ava
 📱 Applications: id, name, description, git_url, git_repo_size, docker_*_duration, created_at
 🔗 User_Applications: id, user_id, application_id, url, http_port, https_port, http_port2, https_port2, created_at
 🚀 Deployments: id, user_id, application_name, status, deployment_path, git_url, server_id, created_at, updated_at
-🖥️ Servers: id, SERVER_IP, SERVER_NAME, SERVER_CAPACITY_USER_MAX, SERVER_CAPACITY_APPLI_MAX, SERVER_STATUS, SERVER_TYPE, created_at
+🖥️ Servers: id, SERVER_IP, SERVER_NAME, SERVER_CAPACITY_USER_MAX, SERVER_CAPACITY_APPLI_MAX, SERVER_STATUS, SERVER_TYPE, shared_gpu_enabled, created_at
 🔑 Auth_Tokens: id, user_id, token_hash, expires_at, created_at
 💰 Application_Costs: id, application_id, cost_per_day, created_at, updated_at
 📊 Billing_Activities: id, user_id, application_id, action, started_at, stopped_at, duration_seconds, cost_amount, created_at
 📝 Users_Logs: id, user_id, username, action, datetime
 💳 Payment_Modes: id, user_id, payment_type, bank_account, paypal_email, card_last_four, card_type, is_default, created_at
 🧾 Invoicing: id, user_id, invoice_month, total_amount, status, payment_date, payment_mode_id, created_at
+🎮 MIG_Profiles: id, server_id, profile_name, profile_id, gpu_memory_gb, created_at
+🖥️ MIG_Instances: id, server_id, instance_uuid, profile_name, gpu_memory_mb, created_at
+⚡ Serverless_Jobs: id, user_id, image, command, env, timeout, status, worker_id, stdout, stderr, exit_code, created_at, started_at, completed_at
+🔒 Password_Reset_Tokens: id, user_id, token_hash, expires_at, created_at
 ```
 
 **Fonctionnalités de Base de Données Améliorées**:
@@ -364,3 +441,38 @@ La plateforme fournit **deux agents IA spécialisés** avec fonctionnalités ava
 - 👥 Isolation utilisateur avec répertoires de déploiement séparés
 - 📝 Journalisation complète pour surveillance de sécurité
 - ⏱️ Gestion de timeout de processus avec nettoyage gracieux
+
+#### 8. 🎮 Gestion GPU Partagé MIG
+
+**Fonctionnalités GPU**:
+- 🖥️ **Partitionnement NVIDIA MIG**: Diviser un seul GPU en jusqu'à 7 instances isolées
+- 🔧 **Configuration Par Serveur**: Activer/désactiver le GPU partagé par serveur via l'interface web ou API
+- 📡 **Gestion via SSH**: Commandes GPU distantes via exécution SSH subprocess
+- 🐳 **Accès GPU Docker**: Chaque instance MIG accessible via le flag `--gpus` dans les conteneurs
+- 🔒 **Accès Admin Uniquement**: Tous les endpoints GPU appliquent l'authentification admin
+- 📊 **Suivi des Instances**: Persistance en base de données des profils MIG et instances actives
+
+**Endpoints API** (`/api/servers/<server_id>/gpu`):
+- `PUT /enabled` — Basculer le GPU partagé (active le mode MIG via SSH à l'activation)
+- `GET /profiles` — Lister les profils de partition MIG disponibles du matériel GPU
+- `GET /instances` — Lister les instances MIG actives depuis la base de données
+- `POST /instances` — Créer des instances MIG à partir d'IDs de profils (1-7)
+- `DELETE /instances` — Détruire toutes les instances MIG sur le serveur
+
+#### 9. ⚡ Exécution Docker Serverless
+
+**Fonctionnalités Serverless**:
+- 🐳 **Conteneurs à la Demande**: Soumettre des jobs Docker sans gérer l'infrastructure
+- 🔒 **Sécurisation Renforcée**: Système de fichiers en lecture seule, pas de réseau, capacités retirées
+- ⏱️ **Application des Timeouts**: Timeouts configurables par job avec terminaison gracieuse
+- 📊 **File d'Attente**: Sauvegardée en PostgreSQL avec `FOR UPDATE SKIP LOCKED` pour workers concurrents
+- 📈 **Mise à l'Échelle Horizontale**: Plusieurs workers peuvent fonctionner simultanément
+- 🧹 **Nettoyage Automatique**: Anciens logs et jobs nettoyés selon la politique de rétention
+
+**Endpoints API** (`/api/jobs`):
+- `POST /jobs` — Soumettre un nouveau job Docker
+- `GET /jobs` — Lister les jobs utilisateur avec pagination et filtrage
+- `GET /jobs/<id>` — Obtenir le statut et métadonnées du job
+- `GET /jobs/<id>/result` — Obtenir stdout/stderr et code de sortie
+- `POST /jobs/<id>/cancel` — Annuler un job en attente ou en cours
+- `GET /jobs/metrics` — Statistiques agrégées des jobs (admin)

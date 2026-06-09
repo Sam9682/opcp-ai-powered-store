@@ -189,13 +189,33 @@ python -m src.serverless.worker
 
 ---
 
+## GPU-Accelerated Jobs
+
+When a server has **MIG Shared GPU** enabled, serverless jobs can access isolated GPU partitions via the `--gpus` Docker flag. This enables:
+
+- **AI/ML Inference** — Run model inference on dedicated GPU slices
+- **Training Jobs** — Execute training workloads with guaranteed GPU memory
+- **Multi-tenant GPU** — Each job gets its own isolated MIG instance
+
+### GPU Job Flow
+
+1. Admin enables MIG shared GPU on a server (via `/api/servers/<id>/gpu/enabled`)
+2. Admin creates MIG instances (e.g., 1g.10gb partitions)
+3. Workers on that server can assign GPU slices to containers
+4. Each container sees only its allocated GPU partition
+
+> **Note**: GPU access requires the server to have `shared_gpu_enabled = true` and active MIG instances. See the [MIG Shared GPU](#) documentation for setup instructions.
+
+---
+
 ## Use Cases
 
 - **CI/CD Pipelines** — Run build, test, and linting steps in isolated containers.
 - **Data Processing** — Execute batch data transformations without dedicated infrastructure.
 - **Scheduled Tasks** — Run periodic jobs (cron-like) with full isolation and resource limits.
-- **AI/ML Workloads** — Submit model training or inference jobs in constrained environments.
+- **AI/ML Workloads** — Submit model training or inference jobs with GPU acceleration via MIG partitions.
 - **Code Execution** — Safely run user-submitted code in sandboxed containers.
+- **GPU Inference** — Run AI model inference on isolated GPU slices without managing GPU infrastructure.
 
 ---
 
@@ -315,5 +335,6 @@ GET /api/jobs/metrics
 - **Pipelines CI/CD** — Exécuter des étapes de build, test et linting dans des conteneurs isolés.
 - **Traitement de données** — Exécuter des transformations batch sans infrastructure dédiée.
 - **Tâches planifiées** — Exécuter des jobs périodiques avec isolation complète et limites de ressources.
-- **Charges IA/ML** — Soumettre des jobs d'entraînement ou d'inférence dans des environnements contraints.
+- **Charges IA/ML** — Soumettre des jobs d'entraînement ou d'inférence avec accélération GPU via partitions MIG.
 - **Exécution de code** — Exécuter en toute sécurité du code soumis par l'utilisateur dans des conteneurs sandboxés.
+- **Inférence GPU** — Exécuter l'inférence de modèles IA sur des tranches GPU isolées sans gérer l'infrastructure GPU.

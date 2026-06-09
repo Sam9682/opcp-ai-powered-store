@@ -187,6 +187,100 @@ POST /api/request_ops_ai_for_app
 - **📈 Activity Logging:** Detailed logs of all billable activities
 - **💰 Revenue Tracking:** Total revenue and cost summaries
 
+### 🎮 MIG Shared GPU Management
+
+The platform provides GPU sharing through NVIDIA Multi-Instance GPU (MIG) technology, allowing administrators to partition a single GPU into multiple isolated instances.
+
+#### 🖥️ Web Interface
+
+Navigate to **Servers** → click **Shared-GPU** button on any server to access the GPU management page:
+
+1. **Enable/Disable**: Toggle switch to activate MIG mode on the server
+2. **View Profiles**: See available partition sizes (e.g., 1g.10gb, 2g.20gb, 4g.40gb)
+3. **Create Instances**: Select profiles and click "Create Instances" (max 7 per GPU)
+4. **Monitor**: View active MIG instances with UUID, profile, memory, and timestamp
+5. **Destroy**: Remove all instances with one click when reconfiguration is needed
+
+#### 🔌 GPU API Endpoints
+
+All GPU endpoints require admin authentication and use the prefix `/api/servers/<server_id>/gpu`:
+
+```bash
+# Enable shared GPU on a server
+curl -X PUT https://www.swautomorph.com/api/servers/1/gpu/enabled \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"enabled": true}'
+
+# List available MIG profiles
+curl https://www.swautomorph.com/api/servers/1/gpu/profiles \
+  -H "Cookie: session=your-session-cookie"
+
+# Create MIG instances (1-7 profile IDs)
+curl -X POST https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"profile_ids": ["9", "14", "9"]}'
+
+# List active instances
+curl https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Cookie: session=your-session-cookie"
+
+# Destroy all instances
+curl -X DELETE https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Cookie: session=your-session-cookie"
+```
+
+#### 🐳 Using GPU Instances in Docker
+
+After creating MIG instances, containers can access specific GPU slices:
+
+```bash
+docker run --gpus '"device=MIG-aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"' my-ai-model:latest
+```
+
+---
+
+### ⚡ Serverless Docker Execution
+
+Submit Docker-based jobs on-demand without managing infrastructure. The platform handles scheduling, execution, security isolation, and result storage.
+
+#### 🔌 Serverless API
+
+```bash
+# Submit a job
+curl -X POST https://www.swautomorph.com/api/jobs \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"image": "python:3.11-slim", "command": ["python", "-c", "print(hello)"], "timeout": 60}'
+
+# Check job status
+curl https://www.swautomorph.com/api/jobs/<job_id> \
+  -H "Cookie: session=your-session-cookie"
+
+# Get job result (stdout/stderr)
+curl https://www.swautomorph.com/api/jobs/<job_id>/result \
+  -H "Cookie: session=your-session-cookie"
+
+# Cancel a job
+curl -X POST https://www.swautomorph.com/api/jobs/<job_id>/cancel \
+  -H "Cookie: session=your-session-cookie"
+
+# List all user jobs
+curl https://www.swautomorph.com/api/jobs?page=1&per_page=20 \
+  -H "Cookie: session=your-session-cookie"
+```
+
+#### 📊 Job States
+- `pending` — Queued, waiting for a worker
+- `running` — Being executed in a container
+- `completed` — Finished successfully
+- `failed` — Container exited with non-zero code
+- `timeout` — Exceeded the configured timeout
+- `cancelled` — Cancelled by user
+
+---
+
 ### 🔧 Troubleshooting
 
 #### 🚫 Authentication Failures
@@ -254,6 +348,14 @@ curl -X POST /api/request_ops_ai_for_app \
   -H "Content-Type: application/json" \
   -H "Cookie: session=your-session-cookie" \
   -d '{"message":"[START] test","application_name":"test"}'
+
+# 🎮 Check GPU status on a server
+curl https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Cookie: session=your-session-cookie"
+
+# ⚡ Check serverless job metrics (admin)
+curl https://www.swautomorph.com/api/jobs/metrics \
+  -H "Cookie: session=your-session-cookie"
 ```
 
 ---
@@ -393,6 +495,34 @@ POST /api/request_ops_ai_for_app
 - **⚙️ Menu Déroulant Configuration:** Accès admin aux Utilisateurs, Serveurs, Base de données
 - **❓ Menu Déroulant Aide:** Accès direct aux guides Architecture, Déploiement et Utilisateur
 - **📱 Responsive Mobile:** Menu hamburger pour appareils mobiles
+
+### 🎮 Gestion GPU Partagé MIG
+
+La plateforme permet le partage GPU via la technologie NVIDIA Multi-Instance GPU (MIG), permettant aux administrateurs de partitionner un seul GPU en plusieurs instances isolées.
+
+#### 🖥️ Interface Web
+
+Naviguer vers **Serveurs** → cliquer sur **Shared-GPU** pour accéder à la page de gestion GPU :
+
+1. **Activer/Désactiver**: Interrupteur pour activer le mode MIG sur le serveur
+2. **Voir les Profils**: Tailles de partition disponibles (ex: 1g.10gb, 2g.20gb, 4g.40gb)
+3. **Créer des Instances**: Sélectionner des profils et cliquer "Créer" (max 7 par GPU)
+4. **Surveiller**: Voir les instances MIG actives avec UUID, profil, mémoire et timestamp
+5. **Détruire**: Supprimer toutes les instances en un clic pour reconfiguration
+
+### ⚡ Exécution Docker Serverless
+
+Soumettre des jobs Docker à la demande sans gérer l'infrastructure. La plateforme gère la planification, l'exécution, l'isolation de sécurité et le stockage des résultats.
+
+#### 📊 États des Jobs
+- `pending` — En file d'attente
+- `running` — En cours d'exécution dans un conteneur
+- `completed` — Terminé avec succès
+- `failed` — Conteneur terminé avec code non-zéro
+- `timeout` — Délai configuré dépassé
+- `cancelled` — Annulé par l'utilisateur
+
+---
 
 ### 🔧 Dépannage
 
