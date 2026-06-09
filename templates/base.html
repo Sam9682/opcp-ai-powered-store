@@ -60,8 +60,8 @@
                 </div>
             </div>
             <div class="lang-toggle">
-                <button id="layoutToggle" class="btn-icon" onclick="toggleLayout()" title="Switch to Horizontal Layout">
-                    🖥️
+                <button id="layoutToggle" class="btn-icon" onclick="toggleLayout()" title="Toggle Layout">
+                    📱
                 </button>
                 <a href="{{ url_for('main.set_language', language='en') }}" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
                 <a href="{{ url_for('main.set_language', language='fr') }}" class="lang-btn {% if current_lang == 'fr' %}active{% endif %}">FR</a>
@@ -100,8 +100,8 @@
                     <a href="{{ url_for('main.index') }}">{{ get_text('login') }}</a>
                 {% endif %}
                 <div class="lang-toggle">
-                    <button id="layoutToggleMobile" class="btn-icon" onclick="toggleLayout()" title="Switch to Horizontal Layout">
-                        🖥️
+                    <button id="layoutToggleMobile" class="btn-icon" onclick="toggleLayout()" title="Toggle Layout">
+                        📱
                     </button>
                     <a href="{{ url_for('main.set_language', language='en') }}" class="lang-btn {% if current_lang == 'en' %}active{% endif %}">EN</a>
                     <a href="{{ url_for('main.set_language', language='fr') }}" class="lang-btn {% if current_lang == 'fr' %}active{% endif %}">FR</a>

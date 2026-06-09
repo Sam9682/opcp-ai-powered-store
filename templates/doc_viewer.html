@@ -268,7 +268,7 @@ function parseMarkdownSections(content) {
     const sections = { en: '', fr: '' };
     
     // Split by language sections
-    const englishMatch = content.match(/## English\s*([\s\S]*?)(?=\n## Français|$)/);
+    const englishMatch = content.match(/## English\s*([\s\S]*?)(?=---|\n## Français|$)/);
     const frenchMatch = content.match(/## Français\s*([\s\S]*?)$/);
     
     if (englishMatch) {

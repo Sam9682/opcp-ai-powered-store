@@ -27,6 +27,11 @@ AI-Powered-Store is a centralized application deployment and management platform
 - 📖 Comprehensive user guide and documentation
 - 🔧 **PostgreSQL connection pooling** with thread-safe operations
 - 🔄 **SQLite to PostgreSQL migration tools**
+- 🎮 **MIG Shared GPU**: NVIDIA Multi-Instance GPU partitioning and management per server
+- ⚡ **Serverless Docker Execution**: Submit and run Docker-based jobs on-demand
+- 🔄 **Multi-server Replication**: Peer-to-peer database replication with sync tokens
+- 🎭 **App Orchestrator**: Automated application lifecycle orchestration with reconciliation
+- 🔒 **Password Reset & 2FA**: Secure password recovery and two-factor authentication via email
 
 ## PostgreSQL Migration
 
@@ -189,6 +194,50 @@ curl -X POST https://www.swautomorph.com/api/servers \
   -d '{"SERVER_IP":"192.168.1.100","SERVER_NAME":"worker-01","SERVER_CAPACITY_USER_MAX":20,"SERVER_CAPACITY_APPLI_MAX":100,"SERVER_STATUS":"STAND_BY","SERVER_TYPE":"worker"}'
 ```
 
+### MIG Shared GPU Management
+```bash
+# Enable shared GPU on a server (admin required)
+curl -X PUT https://www.swautomorph.com/api/servers/1/gpu/enabled \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"enabled": true}'
+
+# List available MIG profiles from GPU hardware
+curl https://www.swautomorph.com/api/servers/1/gpu/profiles \
+  -H "Cookie: session=your-session-cookie"
+
+# Create MIG instances (1-7 profile IDs)
+curl -X POST https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"profile_ids": ["9", "14", "9"]}'
+
+# List active MIG instances
+curl https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Cookie: session=your-session-cookie"
+
+# Destroy all MIG instances on a server
+curl -X DELETE https://www.swautomorph.com/api/servers/1/gpu/instances \
+  -H "Cookie: session=your-session-cookie"
+```
+
+### Serverless Docker Execution
+```bash
+# Submit a serverless Docker job
+curl -X POST https://www.swautomorph.com/api/jobs \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-session-cookie" \
+  -d '{"image": "python:3.11", "command": "python -c \"print(hello)\"", "timeout": 60}'
+
+# Check job status
+curl https://www.swautomorph.com/api/jobs/<job_id> \
+  -H "Cookie: session=your-session-cookie"
+
+# List user jobs
+curl https://www.swautomorph.com/api/jobs \
+  -H "Cookie: session=your-session-cookie"
+```
+
 ### Dynamic Nginx Locations
 ```bash
 # Access user applications via dynamic URLs
@@ -324,19 +373,45 @@ opcp-ai-powered-store/
 │   │   ├── sso_routes.py         # Single Sign-On
 │   │   ├── api_routes.py         # REST API with streaming
 │   │   ├── genai_routes.py       # Virtual AI agents
-│   │   └── billing_routes.py     # Billing & cost tracking
+│   │   ├── billing_routes.py     # Billing & cost tracking
+│   │   ├── orchestrator_routes.py # App lifecycle orchestration
+│   │   ├── replication_routes.py # Multi-server replication
+│   │   ├── security_routes.py   # Password reset & 2FA
+│   │   ├── serverless_routes.py  # Serverless Docker execution
+│   │   └── gpu_routes.py         # MIG shared GPU management
+│   ├── serverless/        # Serverless execution engine
 │   ├── ControlPlanFlaskApp_postgres.py    # Main Flask application
 │   ├── database_postgres.py      # PostgreSQL database manager with connection pooling
 │   ├── database.py               # Legacy SQLite database manager (migration compatibility)
 │   ├── nginx_manager.py          # Dynamic nginx location management
+│   ├── orchestrator.py           # Application orchestration & reconciliation
+│   ├── replication_manager.py    # Peer-to-peer database replication
+│   ├── platform_discovery.py     # Platform capability discovery
 │   ├── config.py                 # Configuration & multi-language
 │   └── auth.py                   # Authentication utilities
+├── migration/             # Database migration scripts
+│   ├── add_serverless_jobs.sql          # Serverless jobs schema
+│   ├── add_mig_gpu.sql                  # MIG GPU tables & server flag
+│   ├── add_password_reset_and_2fa.sql   # Security features schema
+│   └── ...                              # Other migrations
 ├── scripts/               # CLI tools and utilities
-│   ├── aipoweredstore_cli.py                    # Command-line interface
+│   ├── aipoweredstore_cli.py            # Command-line interface
 │   ├── mcp_server.py             # Model Context Protocol server
 │   ├── sync_nginx_locations.py   # Sync nginx locations from database
-│   └── postgresql_schema.sql          # PostgreSQL schema definition
+│   └── postgresql_schema.sql     # PostgreSQL schema definition
+├── tests/                # Test suite (pytest)
+│   ├── test_gpu_parsers.py              # MIG instance parser tests
+│   ├── test_parse_mig_profiles.py       # MIG profile parser tests
+│   ├── test_validate_profile_ids.py     # Profile ID validation tests
+│   ├── test_gpu_enabled_endpoint.py     # GPU enabled toggle tests
+│   ├── test_gpu_delete_instances.py     # GPU instance destruction tests
+│   ├── test_serverless_routes.py        # Serverless API tests
+│   ├── test_container_runtime.py        # Container runtime tests
+│   └── test_worker.py                   # Worker process tests
 ├── templates/            # HTML templates with EN/FR support
+│   ├── shared_gpu.html           # MIG GPU management page
+│   ├── dashboard.html            # Main dashboard
+│   └── ...                       # Other templates
 ├── static/               # CSS, JS, and static files
 ├── ssl/                  # SSL certificates
 ├── logs/                 # Application logs with Gunicorn support
@@ -349,6 +424,7 @@ opcp-ai-powered-store/
 │   ├── NGINX_DYNAMIC_LOCATIONS.md # Dynamic nginx locations guide
 │   └── VIRTUAL_AGENTS_API.md     # Virtual agents API reference
 ├── conf/                 # Configuration files
+├── init_pltf.sh          # Platform initialization (Docker, NVIDIA drivers, MIG)
 └── deployControlPlan.sh  # Main deployment script
 ```
 
@@ -356,15 +432,20 @@ opcp-ai-powered-store/
 
 - **Flask Application**: Multi-blueprint architecture with modular routes and virtual AI agents
 - **Database**: **PostgreSQL with connection pooling** for enterprise-grade performance and thread-safe operations
-- **Authentication**: Session-based with SSO token support and comprehensive user management
+- **Authentication**: Session-based with SSO token support, password reset, and two-factor authentication
 - **Deployment**: Multi-server support with capacity management, automatic allocation, and streaming APIs
+- **App Orchestrator**: Automated application lifecycle management with reconciliation loop
+- **Serverless Execution**: Docker-based job submission and execution engine with worker processes
+- **MIG Shared GPU**: NVIDIA Multi-Instance GPU partitioning via SSH with per-server configuration and web UI
+- **Replication**: Peer-to-peer database replication across multiple servers with sync tokens
 - **Nginx Proxy**: Dynamic location blocks for user applications with automatic configuration
-- **Security**: ModSecurity WAF with OWASP CRS rules and input validation
+- **Security**: ModSecurity WAF with OWASP CRS rules, password reset, and 2FA via email
 - **Monitoring**: Health checks, database statistics, real-time streaming logs, and performance metrics
 - **Virtual AI Agents**: AI Chat Developer and Operations assistants with context-aware prompts
 - **Billing System**: Comprehensive cost tracking with activity logging, usage monitoring, and automated invoicing
 - **Multi-language**: English/French support with session-based language switching and bilingual documentation
 - **Backup System**: Automated hourly backups with S3 sync and interactive recovery tools
+- **Platform Init**: Automated server provisioning including Docker, NVIDIA drivers, and MIG mode setup
 
 ## Troubleshooting
 

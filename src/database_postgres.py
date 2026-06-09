@@ -385,6 +385,19 @@ def init_db():
                 conn.rollback()
                 print(f"[INFO] Serverless jobs migration check: {e}")
 
+            # Apply MIG shared GPU migration
+            try:
+                migration_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migration', 'add_mig_gpu.sql')
+                if os.path.exists(migration_path):
+                    with open(migration_path, 'r') as f:
+                        migration_sql = f.read()
+                    cursor.execute(migration_sql)
+                    conn.commit()
+            except Exception as e:
+                # Migration may already be applied, ignore errors
+                conn.rollback()
+                print(f"[INFO] MIG GPU migration check: {e}")
+
             # Insert default applications if none exist
             cursor.execute('SELECT COUNT(*) FROM applications')
             if cursor.fetchone()[0] == 0:

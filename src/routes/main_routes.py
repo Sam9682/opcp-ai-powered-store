@@ -110,6 +110,20 @@ def favicon():
         print(f"Error serving favicon: {e}")
         return '', 404
 
+@main_bp.route('/servers/<int:server_id>/gpu')
+def shared_gpu_page(server_id):
+    """Serve the Shared GPU configuration page (admin-only)."""
+    if 'user_id' not in session:
+        return redirect(url_for('main.index'))
+
+    # Check if user is admin
+    is_admin = session.get('is_admin', False)
+    if not is_admin:
+        return "Forbidden", 403
+
+    return render_template('shared_gpu.html', server_id=server_id)
+
+
 @main_bp.route('/.well-known/pki-validation/<filename>')
 def ssl_validation(filename):
     """Serve SSL certificate validation files"""

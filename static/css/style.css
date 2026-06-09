@@ -560,119 +560,50 @@ body {
 }
 
 .applications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
     margin-bottom: 2rem;
     margin-top: 0;
+    align-content: start;
     width: 100%;
 }
 
 /* ============================================
-   APPLICATIONS TABLE (list-grid layout)
-   ============================================ */
-.applications-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.applications-table th,
-.applications-table td {
-    padding: 0.6rem 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--color-border-light);
-    font-size: 0.85rem;
-    vertical-align: middle;
-}
-
-.applications-table th {
-    background: var(--color-background);
-    font-weight: 600;
-    color: var(--color-text);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-}
-
-.applications-table tbody tr:hover {
-    background: var(--color-background);
-}
-
-.applications-table .app-id {
-    width: 40px;
-    color: var(--color-text-muted);
-    font-family: monospace;
-}
-
-.applications-table .app-name strong {
-    color: var(--color-text);
-    font-size: 0.9rem;
-}
-
-.applications-table .app-description {
-    color: var(--color-text-muted);
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.applications-table .app-branch .gitea-info {
-    margin: 0;
-    padding: 0;
-    background: none;
-}
-
-.applications-table .app-branch .gitea-branch-select {
-    padding: 3px 6px;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-    font-size: 0.8rem;
-    max-width: 140px;
-}
-
-.applications-table .app-version {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.applications-table .app-table-actions {
-    white-space: nowrap;
-}
-
-.applications-table .app-action-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    align-items: center;
-}
-
-.applications-table .app-action-buttons .btn-small {
-    font-size: 0.75rem;
-    padding: 3px 8px;
-    white-space: nowrap;
-}
-
-/* ============================================
-   APP CARDS (table row styling)
+   APP CARDS
    ============================================ */
 .app-card {
-    transition: background-color var(--transition);
+    background: var(--color-surface);
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition), border-color var(--transition);
+    position: relative;
+    border: 1px solid var(--color-border);
 }
 
 .app-card:hover {
-    background: var(--color-background);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-accent);
 }
 
-.app-card .app-card-name {
+.app-card h3 {
+    margin-bottom: 0.4rem;
     color: var(--color-text);
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
 }
 
+.app-card p {
+    margin-bottom: 0.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
 .app-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
     display: flex;
     gap: 0.2rem;
 }
@@ -1039,27 +970,21 @@ body {
 /* Unified controls */
 .unified-controls {
     display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.6rem 0.75rem;
     border-bottom: 1px solid var(--color-border-light);
     height: auto;
-    align-items: center;
 }
 
 .unified-controls select {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
     padding: 0.4rem 0.6rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background: var(--color-surface);
     box-sizing: border-box;
     font-size: 0.85rem;
-}
-
-.unified-controls .toggle-btn {
-    flex-shrink: 0;
 }
 
 /* Messages area */
@@ -2127,16 +2052,7 @@ body {
     }
 
     .applications-grid {
-        overflow-x: auto;
-    }
-
-    .applications-table {
-        min-width: 700px;
-    }
-
-    .applications-table th,
-    .applications-table td {
-        white-space: nowrap;
+        grid-template-columns: 1fr;
     }
 
     .main-content {
@@ -2238,7 +2154,6 @@ body {
     }
 
     .unified-controls {
-        flex-direction: column;
         padding: 0.5rem;
         gap: 0.5rem;
     }

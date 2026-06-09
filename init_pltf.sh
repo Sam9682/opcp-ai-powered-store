@@ -118,6 +118,39 @@ sudo chmod +x /usr/local/bin/docker-compose
 rm -f get-docker.sh
 print_success "Docker installed"
 
+# Install NVIDIA GPU Drivers and MIG Support
+print_step "Installing NVIDIA GPU drivers..."
+sudo apt install -y nvidia-driver-550 nvidia-utils-550 > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    print_success "NVIDIA drivers installed"
+    
+    print_step "Enabling MIG mode..."
+    sudo nvidia-smi -mig 1 > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        print_success "MIG mode enabled"
+    else
+        print_warning "MIG mode could not be enabled (GPU may not support MIG)"
+    fi
+    
+    print_step "Installing NVIDIA Container Toolkit..."
+    sudo apt install -y nvidia-container-toolkit > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        print_success "NVIDIA Container Toolkit installed"
+        
+        print_step "Verifying Docker GPU access..."
+        timeout 30 docker run --rm --gpus '"device=0"' nvidia/cuda:12.3.0-base-ubuntu22.04 nvidia-smi > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            print_success "Docker GPU access verified"
+        else
+            print_warning "Docker GPU access verification failed (GPU may not be available)"
+        fi
+    else
+        print_warning "NVIDIA Container Toolkit installation failed"
+    fi
+else
+    print_warning "NVIDIA driver installation failed (no GPU or incompatible hardware), skipping GPU setup"
+fi
+
 # Configure AWS
 print_step "Configuring AWS credentials..."
 mkdir -p ~/.aws

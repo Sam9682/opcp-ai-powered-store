@@ -3,7 +3,7 @@
 {% block title %}{{ get_text('dashboard') }} - {{ PLTF_NAME }}{% endblock %}
 
 {% block content %}
-<div class="dashboard-layout vertical">
+<div class="dashboard-layout">
     <div class="main-panel">
         <div class="dashboard-container">
 
@@ -17,64 +17,55 @@
         </div>
     
     <div class="applications-grid">
-        <div style="overflow-x: auto;">
-        <table class="applications-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>{{ get_text('application_name') }}</th>
-                    <th>{{ get_text('description') }}</th>
-                    <th>{{ get_text('gitea_branch') }}</th>
-                    <th>{{ get_text('local_active_version') }}</th>
-                    <th>{{ get_text('actions') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications %}
-                <tr class="app-card" id="appRow-{{ app[1] | replace(' ', '-') | lower }}">
-                    <td class="app-id"><input type="hidden" class="application_status" value="is_not_cloned">{{ app[0] }}</td>
-                    <td class="app-name">
-                        <strong class="app-card-name">{{ app[1] }}</strong>
-                    </td>
-                    <td class="app-description">{{ app[3] or get_text('no_description') }}</td>
-                    <td class="app-branch">
-                        <div class="gitea-info" id="gitea-{{ app[1] | replace(' ', '-') | lower }}">
-                            <select class="gitea-branch-select">
-                                <option value="">Loading...</option>
-                            </select>
-                        </div>
-                    </td>
-                    <td class="app-version">
-                        <span class="gitea-active-version" id="version-{{ app[1] | replace(' ', '-') | lower }}">Loading...</span>
-                    </td>
-                    <td class="app-table-actions">
-                        <div class="app-action-buttons">
-                            <a href="{{ app[2] }}" target="_blank" class="btn btn-primary btn-small" id="openBtn-{{ app[1] | replace(' ', '-') | lower }}">🔗 {{ get_text('open_application') }}</a>
-                            {% if app[4] %}
-                            <button onclick="cloneFromSelectedBranch('{{ app[1] }}', {{ app[6] or 50 }})" class="btn btn-secondary btn-small" id="cloneBtn-{{ app[1] | replace(' ', '-') | lower }}">📥 {{ get_text('clone') }}</button>
-                            {% if username == 'admin' %}
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'start', null, {{ app[7] or 30 }})" class="btn btn-success btn-small" id="startBtn-{{ app[1] | replace(' ', '-') | lower }}">▶️ {{ get_text('start') }}</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'stop', null, null, {{ app[9] or 10 }})" class="btn btn-danger btn-small" id="stopBtn-{{ app[1] | replace(' ', '-') | lower }}">⏹️ {{ get_text('stop') }}</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'restart')" class="btn btn-warning btn-small" id="restartBtn-{{ app[1] | replace(' ', '-') | lower }}">🔄 {{ get_text('restart') }}</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'ps')" class="btn btn-info btn-small" id="psBtn-{{ app[1] | replace(' ', '-') | lower }}" title="{{ get_text('status') }}">📊</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'logs')" class="btn btn-secondary btn-small" id="logsBtn-{{ app[1] | replace(' ', '-') | lower }}" title="{{ get_text('logs') }}">📋</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'backup_database')" class="btn btn-secondary btn-small" id="backupDbBtn-{{ app[1] | replace(' ', '-') | lower }}" style="display: none;" title="{{ get_text('backup_db') }}">💾</button>
-                            <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'restore_database')" class="btn btn-secondary btn-small" id="restoreDbBtn-{{ app[1] | replace(' ', '-') | lower }}" style="display: none;" title="{{ get_text('restore_db') }}">♻️</button>
-                            {% endif %}
-                            {% endif %}
-                            {% if username == 'admin' %}
-                            <button onclick="editApp({{ app[0] }}, '{{ app[1] }}', '{{ app[2] }}', '{{ app[3] or '' }}', '{{ app[4] or '' }}', {{ app[6] or 50 }}, {{ app[7] or 'null' }}, {{ app[8] or 'null' }}, {{ app[9] or 'null' }}, {{ app[10] or 'null' }}, '{{ app[11] or 'Not yet deployed' }}')" class="btn btn-secondary btn-small" title="Edit">✏️</button>
-                            <button onclick="deleteApp({{ app[0] }}, '{{ app[1] }}')" class="btn btn-danger btn-small" title="Delete">🗑️</button>
-                            {% else %}
-                            <button onclick="viewApp({{ app[0] }}, '{{ app[1] }}', '{{ app[2] }}', '{{ app[3] or '' }}', '{{ app[4] or '' }}', '{{ app[5] or '' }}', '{{ app[11] or 'Not yet deployed' }}')" class="btn btn-secondary btn-small" title="View Details">👁️</button>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% for app in applications %}
+        <div class="app-card">
+            <input type="hidden" class="application_status" value="is_not_cloned">
+            {% if username == 'admin' %}
+            <div class="app-actions">
+                <button onclick="editApp({{ app[0] }}, '{{ app[1] }}', '{{ app[2] }}', '{{ app[3] or '' }}', '{{ app[4] or '' }}', {{ app[6] or 50 }}, {{ app[7] or 'null' }}, {{ app[8] or 'null' }}, {{ app[9] or 'null' }}, {{ app[10] or 'null' }}, '{{ app[11] or 'Not yet deployed' }}')" class="btn-icon" title="Edit">
+                    ✏️
+                </button>
+                <button onclick="deleteApp({{ app[0] }}, '{{ app[1] }}')" class="btn-icon" title="Delete">
+                    🗑️
+                </button>
+            </div>
+            {% else %}
+            <div class="app-actions">
+                <button onclick="viewApp({{ app[0] }}, '{{ app[1] }}', '{{ app[2] }}', '{{ app[3] or '' }}', '{{ app[4] or '' }}', '{{ app[5] or '' }}', '{{ app[11] or 'Not yet deployed' }}')" class="btn-icon" title="View Details">
+                    👁️
+                </button>
+            </div>
+            {% endif %}
+            <h3>{{ app[1] }}</h3>
+            <p> (Id={{ app[0] }}) {{ app[3] or get_text('no_description') }}</p>
+            <div class="gitea-info" id="gitea-{{ app[1] | replace(' ', '-') | lower }}" style="margin: 10px 0; padding: 8px; background: #f8f9fa; border-radius: 4px; font-size: 12px;">
+                <div style="margin-bottom: 5px;">
+                    <strong>📦 {{ get_text('gitea_branch') }}:</strong> 
+                    <select class="gitea-branch-select" style="margin-left: 5px; padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; max-width: 100%; width: auto; box-sizing: border-box;">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                <div style="word-wrap: break-word; overflow-wrap: break-word;"><strong>🔖 {{ get_text('local_active_version') }}:</strong> <span class="gitea-active-version" style="word-wrap: break-word;">Loading...</span></div>
+            </div>
+            <div class="app-buttons">
+                <a href="{{ app[2] }}" target="_blank" class="btn btn-primary" id="openBtn-{{ app[1] | replace(' ', '-') | lower }}">{{ get_text('open_application') }}</a>
+                {% if app[4] %}
+                <div class="deployment-buttons">
+                    <button onclick="cloneFromSelectedBranch('{{ app[1] }}', {{ app[6] or 50 }})" class="btn btn-secondary btn-small" id="cloneBtn-{{ app[1] | replace(' ', '-') | lower }}">📥 {{ get_text('clone') }}</button>
+                    {% if username == 'admin' %}
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'start', null, {{ app[7] or 30 }})" class="btn btn-success btn-small" id="startBtn-{{ app[1] | replace(' ', '-') | lower }}">▶️ {{ get_text('start') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'stop', null, null, {{ app[9] or 10 }})" class="btn btn-danger btn-small" id="stopBtn-{{ app[1] | replace(' ', '-') | lower }}">⏹️ {{ get_text('stop') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'restart')" class="btn btn-warning btn-small" id="restartBtn-{{ app[1] | replace(' ', '-') | lower }}">🔄 {{ get_text('restart') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'ps')" class="btn btn-info btn-small" id="psBtn-{{ app[1] | replace(' ', '-') | lower }}">📊 {{ get_text('status') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'logs')" class="btn btn-secondary btn-small" id="logsBtn-{{ app[1] | replace(' ', '-') | lower }}">📋 {{ get_text('logs') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'backup_database')" class="btn btn-secondary btn-small" id="backupDbBtn-{{ app[1] | replace(' ', '-') | lower }}" style="display: none;">💾 {{ get_text('backup_db') }}</button>
+                    <button onclick="deploy_sh_executionCmdInApp('{{ app[1] }}', '', 'restore_database')" class="btn btn-secondary btn-small" id="restoreDbBtn-{{ app[1] | replace(' ', '-') | lower }}" style="display: none;">♻️ {{ get_text('restore_db') }}</button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
         </div>
+        {% endfor %}
     </div>
     
     {% if not applications %}
@@ -877,6 +868,10 @@
     <!-- Virtual Agents Panel -->
     <div class="agents-panel" id="agentsPanel">
         <div id="virtualAgentsPanel" class="virtual-agents-panel" style="background-color: rgb(177, 177, 177);">
+            <div class="panel-header">
+                <h3>🤖 {{ get_text('virtual_agents') }}</h3>
+                <button id="togglePanel" class="toggle-btn" onclick="toggleAgentsPanel()">−</button>
+            </div>
             
             <div class="panel-content">
                 <!-- Unified Agent Area -->
@@ -896,7 +891,6 @@
                             <option value="LOGS">{{ get_text('display_logs_option') }}</option>
                             <option value="PS">{{ get_text('display_ps_option') }}</option>
                         </select>
-                        <button id="togglePanel" class="toggle-btn" onclick="toggleAgentsPanel()" title="Toggle panel">−</button>
                     </div>
                         <!-- Persistent message container -->
                         <div class="message operations-assistant" id="persistentMessageContainer" style="width: 100%; height: 100%;">
@@ -2305,22 +2299,18 @@ function loadAvailableApplications() {
                 return;
             }
             
-            // Display available applications as a table matching the main apps list
-            let tableHtml = `<div style="overflow-x: auto;"><table class="applications-table"><thead><tr><th>ID</th><th>{{ get_text('application_name') }}</th><th>{{ get_text('description') }}</th><th>{{ get_text('actions') }}</th></tr></thead><tbody>`;
-            apps.forEach(app => {
-                tableHtml += `<tr class="app-card" style="opacity: 0.8;">
-                    <td class="app-id">${app.id}</td>
-                    <td class="app-name"><strong class="app-card-name">🔒 ${app.name}</strong></td>
-                    <td class="app-description">${app.description || translations.noDescription}</td>
-                    <td class="app-table-actions">
-                        <div class="app-action-buttons">
-                            <button onclick="viewAvailableApp(${app.id}, '${app.name.replace(/'/g, "\\'")}', '${(app.description || '').replace(/'/g, "\\'")}', '${(app.git_url || '').replace(/'/g, "\\'")}', ${app.git_repo_size})" class="btn btn-secondary btn-small" title="${translations.viewDetails}">👁️ ${translations.viewDetails}</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-            tableHtml += '</tbody></table></div>';
-            availableAppsGrid.innerHTML = tableHtml;
+            // Display available applications
+            availableAppsGrid.innerHTML = apps.map(app => `
+                <div class="app-card" style="opacity: 0.8; border: 2px dashed #ddd;">
+                    <div class="app-actions">
+                        <button onclick="viewAvailableApp(${app.id}, '${app.name.replace(/'/g, "\\'")}', '${(app.description || '').replace(/'/g, "\\'")}', '${(app.git_url || '').replace(/'/g, "\\'")}', ${app.git_repo_size})" class="btn-icon" title="${translations.viewDetails}">
+                            👁️
+                        </button>
+                    </div>
+                    <h3>🔒 ${app.name}</h3>
+                    <p>${app.description || translations.noDescription}</p>
+                </div>
+            `).join('');
         })
         .catch(error => {
             console.error('Error loading available applications:', error);
@@ -2392,7 +2382,7 @@ function viewAvailableApp(appId, appName, description, gitUrl, gitRepoSize) {
 function loadAllGiteaInfo() {
     const appCards = document.querySelectorAll('.app-card');
     appCards.forEach(card => {
-        const appName = card.querySelector('.app-card-name').textContent;
+        const appName = card.querySelector('h3').textContent;
         loadGiteaInfo(appName);
     });
 }
@@ -2405,8 +2395,7 @@ function loadGiteaInfo(appName) {
             if (!giteaDiv) return;
             
             const branchSelect = giteaDiv.querySelector('.gitea-branch-select');
-            const appRow = giteaDiv.closest('.app-card') || giteaDiv.parentElement;
-            const activeVersionSpan = appRow ? appRow.querySelector('.gitea-active-version') : null;
+            const activeVersionSpan = giteaDiv.querySelector('.gitea-active-version');
             
             let history = data.modification_history;
             if (typeof history === 'string') {
@@ -2423,13 +2412,11 @@ function loadGiteaInfo(appName) {
                     
                     // Display local active version: gitea_branch_url if cloned, otherwise git_url from applications
                     let activeVersionUrl = data.gitea_branch_url || (app ? app.git_url : null);
-                    if (activeVersionSpan) {
-                        if (activeVersionUrl) {
-                            const versionName = activeVersionUrl;
-                            activeVersionSpan.textContent = versionName;
-                        } else {
-                            activeVersionSpan.textContent = 'Not cloned yet';
-                        }
+                    if (activeVersionUrl) {
+                        const versionName = activeVersionUrl;
+                        activeVersionSpan.textContent = versionName;
+                    } else {
+                        activeVersionSpan.textContent = 'Not cloned yet';
                     }
                     
                     if (app && app.git_url) {
@@ -2515,7 +2502,7 @@ function cloneFromSelectedBranch(appName, repoSize) {
 function checkAllApplicationStatus() {
     const appCards = document.querySelectorAll('.app-card');
     appCards.forEach(card => {
-        const appName = card.querySelector('.app-card-name').textContent.split(' ')[0];
+        const appName = card.querySelector('h3').textContent.split(' ')[0];
         checkApplicationStatus(appName);
     });
 }
@@ -2560,7 +2547,7 @@ function updateApplicationButtonStatus(appName, logs) {
     let appCard = null;
     
     for (const card of appCards) {
-        const cardTitle = card.querySelector('.app-card-name').textContent.split(' ')[0];
+        const cardTitle = card.querySelector('h3').textContent.split(' ')[0];
         if (cardTitle.includes(appName)) {
             appCard = card;
             break;
@@ -2621,15 +2608,7 @@ function updateApplicationButtonStatus(appName, logs) {
     // Remove or add application from list based on status
     if (applicationStatus === 'is_not_cloned') {
         // Keep app card visible in main panel but hide from virtual agent dropdown
-        appCard.style.display = '';
-        appCard.style.backgroundColor = '';
-        
-        // Reset action buttons background
-        const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
-        if (actionButtonsDiv) {
-            actionButtonsDiv.style.backgroundColor = '';
-            actionButtonsDiv.style.padding = '';
-        }
+        appCard.style.display = 'block';
         
         // Remove from virtual agent dropdown only
         const virtualAgentOption = document.getElementById(`virtualAgent-${appName.replace(/\s+/g, '-').toLowerCase()}`);
@@ -2675,7 +2654,7 @@ function updateApplicationButtonStatus(appName, logs) {
 
     } else {
         // Show the app card for cloned applications
-        appCard.style.display = '';
+        appCard.style.display = 'block';
         
         // Show in virtual agent dropdown
         const virtualAgentOption = document.getElementById(`virtualAgent-${appName.replace(/\s+/g, '-').toLowerCase()}`);
@@ -2701,12 +2680,6 @@ function updateApplicationButtonStatus(appName, logs) {
         
         if (isRunning) {
             // Application is running
-            appCard.style.backgroundColor = '';
-            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
-            if (actionButtonsDiv) {
-                actionButtonsDiv.style.backgroundColor = '';
-                actionButtonsDiv.style.padding = '';
-            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-danger');
                 openBtn.classList.add('btn-success');
@@ -2732,13 +2705,6 @@ function updateApplicationButtonStatus(appName, logs) {
 
         } else if (isNotRunning) {
             // Application is cloned but not running
-            appCard.style.backgroundColor = '#f8d7da';
-            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
-            if (actionButtonsDiv) {
-                actionButtonsDiv.style.backgroundColor = '';
-                actionButtonsDiv.style.borderRadius = '';
-                actionButtonsDiv.style.padding = '';
-            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-success', 'btn-secondary');
                 openBtn.classList.add('btn-danger');
@@ -2772,12 +2738,6 @@ function updateApplicationButtonStatus(appName, logs) {
 
         } else if (isClonedButNotCompliant) {
             // Application is cloned but deployApp.sh is missing (not compliant)
-            appCard.style.backgroundColor = '';
-            const actionButtonsDiv = appCard.querySelector('.app-action-buttons');
-            if (actionButtonsDiv) {
-                actionButtonsDiv.style.backgroundColor = '';
-                actionButtonsDiv.style.padding = '';
-            }
             if (openBtn) {
                 openBtn.classList.remove('btn-primary', 'btn-success', 'btn-danger');
                 openBtn.classList.add('btn-warning');
@@ -3361,7 +3321,7 @@ function checkApplicationStatusForActions(appName) {
     let applicationStatus = 'is_not_cloned';
     
     for (const card of appCards) {
-        const cardTitle = card.querySelector('.app-card-name').textContent.split(' ')[0];
+        const cardTitle = card.querySelector('h3').textContent.split(' ')[0];
         if (cardTitle.includes(appName)) {
             const statusField = card.querySelector('.application_status');
             if (statusField) {
@@ -4144,6 +4104,7 @@ function loadServers() {
                         <button onclick="syncServer(${server.id})" class="btn-small btn-info" ${syncDisabled}>Synchronization</button>
                         <button onclick="promoteServer(${server.id})" class="btn-small btn-primary" ${promoteDisabled}>Promote PRIMARY</button>
                         <button onclick="promoteSecondaryServer(${server.id})" class="btn-small btn-secondary" ${promoteSecondaryDisabled}>Promote SECONDARY</button>
+                        <button onclick="window.location.href='/servers/${server.id}/gpu'" class="btn-small btn-warning">Shared-GPU</button>
                         <button onclick="deleteServer(${server.id})" class="btn-small btn-danger" ${deleteDisabled}>Delete</button>
                     </td>
                 </tr>`;
