@@ -15,6 +15,7 @@ function startServerlessAutoRefresh() {
     serverlessRefreshInterval = setInterval(function() {
         refreshJobList();
         loadServerlessMetrics();
+        loadServerlessLinks();
     }, 5000);
 }
 
@@ -30,7 +31,7 @@ function stopServerlessAutoRefresh() {
 
 /**
  * Load available opcp-serverless-brik endpoint links into the target dropdown
- * and display them in the links panel.
+ * and display them in the links panel with availability status.
  */
 async function loadServerlessLinks() {
     const select = document.getElementById('serverlessTargetLink');
@@ -49,31 +50,67 @@ async function loadServerlessLinks() {
         }
 
         const data = await response.json();
+        const endpoints = data.endpoints || [];
         const links = data.links || [];
 
-        if (links.length === 0) {
+        if (endpoints.length === 0 && links.length === 0) {
             if (select) select.innerHTML = '<option value="">-- No endpoints available --</option>';
             if (linksContent) linksContent.innerHTML = '<p style="color:orange;">No opcp-serverless-brik endpoints are currently assigned. Please contact your administrator.</p>';
             return;
         }
 
-        // Populate dropdown
-        if (select) {
-            let selectHtml = '<option value="">-- Select target endpoint --</option>';
-            for (const link of links) {
-                selectHtml += '<option value="' + link + '">' + link + '</option>';
+        // Use endpoints (with status) if available, otherwise fall back to flat links
+        if (endpoints.length > 0) {
+            // Populate dropdown with status indicators
+            if (select) {
+                let selectHtml = '<option value="">-- Select target endpoint --</option>';
+                for (const ep of endpoints) {
+                    const statusLabel = ep.status === 'AVAILABLE' ? '✅' : ep.status === 'OCCUPIED' ? '🔒' : '❓';
+                    const disabled = ep.status === 'OCCUPIED' ? ' disabled' : '';
+                    selectHtml += '<option value="' + ep.url + '"' + disabled + '>' + statusLabel + ' ' + ep.url + ' (' + ep.username + ') - ' + ep.status + '</option>';
+                }
+                select.innerHTML = selectHtml;
             }
-            select.innerHTML = selectHtml;
-        }
 
-        // Populate links panel
-        if (linksContent) {
-            let panelHtml = '<ul style="list-style: none; padding: 0; margin: 0;">';
-            for (const link of links) {
-                panelHtml += '<li style="margin-bottom: 5px;"><a href="' + link + '" target="_blank" style="color:#007bff; text-decoration:none;">🌐 ' + link + '</a></li>';
+            // Populate links panel with status badges
+            if (linksContent) {
+                let panelHtml = '<table style="width:100%; border-collapse:collapse;">';
+                panelHtml += '<tr style="border-bottom:1px solid #ddd;"><th style="text-align:left; padding:5px;">Endpoint</th><th style="text-align:left; padding:5px;">Owner</th><th style="text-align:left; padding:5px;">Status</th></tr>';
+                for (const ep of endpoints) {
+                    let statusBadge;
+                    if (ep.status === 'AVAILABLE') {
+                        statusBadge = '<span style="background:#28a745; color:#fff; padding:2px 8px; border-radius:3px; font-size:12px;">✅ AVAILABLE</span>';
+                    } else if (ep.status === 'OCCUPIED') {
+                        statusBadge = '<span style="background:#dc3545; color:#fff; padding:2px 8px; border-radius:3px; font-size:12px;">🔒 OCCUPIED</span>';
+                    } else {
+                        statusBadge = '<span style="background:#6c757d; color:#fff; padding:2px 8px; border-radius:3px; font-size:12px;">❓ UNKNOWN</span>';
+                    }
+                    panelHtml += '<tr style="border-bottom:1px solid #eee;">';
+                    panelHtml += '<td style="padding:5px;"><a href="' + ep.url + '" target="_blank" style="color:#007bff; text-decoration:none;">' + ep.url + '</a></td>';
+                    panelHtml += '<td style="padding:5px;">' + ep.username + '</td>';
+                    panelHtml += '<td style="padding:5px;">' + statusBadge + '</td>';
+                    panelHtml += '</tr>';
+                }
+                panelHtml += '</table>';
+                linksContent.innerHTML = panelHtml;
             }
-            panelHtml += '</ul>';
-            linksContent.innerHTML = panelHtml;
+        } else {
+            // Fallback: use flat links without status
+            if (select) {
+                let selectHtml = '<option value="">-- Select target endpoint --</option>';
+                for (const link of links) {
+                    selectHtml += '<option value="' + link + '">' + link + '</option>';
+                }
+                select.innerHTML = selectHtml;
+            }
+            if (linksContent) {
+                let panelHtml = '<ul style="list-style: none; padding: 0; margin: 0;">';
+                for (const link of links) {
+                    panelHtml += '<li style="margin-bottom: 5px;"><a href="' + link + '" target="_blank" style="color:#007bff; text-decoration:none;">🌐 ' + link + '</a></li>';
+                }
+                panelHtml += '</ul>';
+                linksContent.innerHTML = panelHtml;
+            }
         }
     } catch (err) {
         if (select) select.innerHTML = '<option value="">-- Error loading links --</option>';

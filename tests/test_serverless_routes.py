@@ -365,8 +365,9 @@ class TestGetJobStatusNotFound:
 class TestGetJobStatusOwnership:
     """Test ownership and admin access for GET /api/jobs/<job_id>."""
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_403_when_not_owner_and_not_admin(self, mock_db, client, app):
+    def test_returns_403_when_not_owner_and_not_admin(self, mock_db, mock_sync, client, app):
         from datetime import datetime
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',  # id
@@ -378,6 +379,7 @@ class TestGetJobStatusOwnership:
             None,  # completed_at
             None,  # exit_code
             'worker-001',  # worker_id
+            'http://opcp-psmc.com:6132',  # target_link
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 1
@@ -387,8 +389,9 @@ class TestGetJobStatusOwnership:
         data = response.get_json()
         assert data["error"] == "Access denied"
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_200_when_user_is_owner(self, mock_db, client, app):
+    def test_returns_200_when_user_is_owner(self, mock_db, mock_sync, client, app):
         from datetime import datetime
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
@@ -400,14 +403,16 @@ class TestGetJobStatusOwnership:
             None,
             None,
             'worker-001',
+            'http://opcp-psmc.com:6132',
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 42
         response = client.get('/api/jobs/550e8400-e29b-41d4-a716-446655440000')
         assert response.status_code == 200
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_200_when_user_is_admin(self, mock_db, client, app):
+    def test_returns_200_when_user_is_admin(self, mock_db, mock_sync, client, app):
         from datetime import datetime
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
@@ -419,6 +424,7 @@ class TestGetJobStatusOwnership:
             datetime(2024, 1, 15, 10, 31, 0),
             0,
             'worker-001',
+            'http://opcp-psmc.com:6132',
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 1
@@ -430,8 +436,9 @@ class TestGetJobStatusOwnership:
 class TestGetJobStatusResponse:
     """Test response format for GET /api/jobs/<job_id>."""
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_full_job_metadata(self, mock_db, client, app):
+    def test_returns_full_job_metadata(self, mock_db, mock_sync, client, app):
         from datetime import datetime
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
@@ -443,6 +450,7 @@ class TestGetJobStatusResponse:
             None,
             None,
             'worker-001',
+            'http://opcp-psmc.com:6132',
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 42
@@ -458,8 +466,9 @@ class TestGetJobStatusResponse:
         assert data["exit_code"] is None
         assert data["worker_id"] == "worker-001"
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_completed_job_with_exit_code(self, mock_db, client, app):
+    def test_returns_completed_job_with_exit_code(self, mock_db, mock_sync, client, app):
         from datetime import datetime
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
@@ -471,6 +480,7 @@ class TestGetJobStatusResponse:
             datetime(2024, 1, 15, 10, 31, 0),
             0,
             'worker-001',
+            'http://opcp-psmc.com:6132',
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 42
@@ -517,13 +527,15 @@ class TestGetJobResultNotFound:
 class TestGetJobResultOwnership:
     """Test ownership and admin access for GET /api/jobs/<job_id>/result."""
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_403_when_not_owner_and_not_admin(self, mock_db, client, app):
+    def test_returns_403_when_not_owner_and_not_admin(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',  # id
             99,  # user_id (different from session user)
             'completed',  # status
             0,  # exit_code
+            'http://opcp-psmc.com:6132',  # target_link
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 1
@@ -533,8 +545,9 @@ class TestGetJobResultOwnership:
         data = response.get_json()
         assert data["error"] == "Access denied"
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_200_when_user_is_admin(self, mock_db, client, app):
+    def test_returns_200_when_user_is_admin(self, mock_db, mock_sync, client, app):
         # First call: job query, second call: logs, third call: result
         mock_db.execute_query.side_effect = [
             (
@@ -542,6 +555,7 @@ class TestGetJobResultOwnership:
                 99,  # user_id (different from session user)
                 'completed',  # status
                 0,  # exit_code
+                'http://opcp-psmc.com:6132',  # target_link
             ),
             [],  # logs
             None,  # result
@@ -556,13 +570,15 @@ class TestGetJobResultOwnership:
 class TestGetJobResultTerminalState:
     """Test 409 when job is not in terminal state."""
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_409_when_job_is_pending(self, mock_db, client, app):
+    def test_returns_409_when_job_is_pending(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
             42,
             'pending',  # not terminal
             None,
+            None,  # target_link (None so sync returns None)
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 42
@@ -571,13 +587,15 @@ class TestGetJobResultTerminalState:
         data = response.get_json()
         assert data["error"] == "Job is still in progress"
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_409_when_job_is_running(self, mock_db, client, app):
+    def test_returns_409_when_job_is_running(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.return_value = (
             '550e8400-e29b-41d4-a716-446655440000',
             42,
             'running',  # not terminal
             None,
+            None,  # target_link (None so sync returns None)
         )
         with client.session_transaction() as sess:
             sess['user_id'] = 42
@@ -590,8 +608,9 @@ class TestGetJobResultTerminalState:
 class TestGetJobResultResponse:
     """Test response format for GET /api/jobs/<job_id>/result."""
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_full_result_with_logs(self, mock_db, client, app):
+    def test_returns_full_result_with_logs(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.side_effect = [
             # First call: job query
             (
@@ -599,6 +618,7 @@ class TestGetJobResultResponse:
                 42,
                 'completed',
                 0,
+                'http://opcp-psmc.com:6132',
             ),
             # Second call: logs query
             [
@@ -619,8 +639,9 @@ class TestGetJobResultResponse:
         assert data["stderr"] == "warning: something\n"
         assert data["result"] == {"key": "structured_output"}
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_result_with_no_logs(self, mock_db, client, app):
+    def test_returns_result_with_no_logs(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.side_effect = [
             # First call: job query
             (
@@ -628,6 +649,7 @@ class TestGetJobResultResponse:
                 42,
                 'failed',
                 1,
+                'http://opcp-psmc.com:6132',
             ),
             # Second call: logs query (empty)
             [],
@@ -644,14 +666,16 @@ class TestGetJobResultResponse:
         assert data["stderr"] == ""
         assert data["result"] is None
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_result_for_timeout_status(self, mock_db, client, app):
+    def test_returns_result_for_timeout_status(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.side_effect = [
             (
                 '550e8400-e29b-41d4-a716-446655440000',
                 42,
                 'timeout',
                 137,
+                'http://opcp-psmc.com:6132',
             ),
             [('stderr', 'Process killed due to timeout\n')],
             None,
@@ -666,14 +690,16 @@ class TestGetJobResultResponse:
         assert data["stderr"] == "Process killed due to timeout\n"
         assert data["result"] is None
 
+    @patch('src.routes.serverless_routes.sync_job_from_remote', return_value=None)
     @patch('src.routes.serverless_routes.db_manager')
-    def test_returns_result_for_cancelled_status(self, mock_db, client, app):
+    def test_returns_result_for_cancelled_status(self, mock_db, mock_sync, client, app):
         mock_db.execute_query.side_effect = [
             (
                 '550e8400-e29b-41d4-a716-446655440000',
                 42,
                 'cancelled',
                 None,
+                'http://opcp-psmc.com:6132',
             ),
             [],
             None,

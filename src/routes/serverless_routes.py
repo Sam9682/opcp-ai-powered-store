@@ -6,6 +6,7 @@ import json
 import math
 import os
 import logging
+import requests as http_requests
 
 # Configure logging for serverless API activities
 logger = logging.getLogger(__name__)
@@ -37,9 +38,107 @@ logger.propagate = False
 serverless_bp = Blueprint('serverless', __name__, url_prefix='/api')
 
 
+# Map remote opcp-serverless-brik statuses to local DB statuses
+REMOTE_STATUS_MAP = {
+    'success': 'completed',
+    'completed': 'completed',
+    'failed': 'failed',
+    'error': 'failed',
+    'timeout': 'timeout',
+    'running': 'running',
+    'pending': 'pending',
+    'cancelled': 'cancelled',
+}
+
+
+def sync_job_from_remote(job_id, target_link):
+    """Poll the remote opcp-serverless-brik endpoint to get actual job status and update local DB.
+    
+    Returns the remote response data dict if successful, or None if the remote is unreachable.
+    """
+    if not target_link:
+        return None
+
+    # Build the remote URL: target_link is like https://opcp-psmc.com:6133
+    # The remote API is at {target_link}/jobs/{job_id}
+    # But user's curl shows http://opcp-psmc.com:6132/jobs/{id} - use HTTP port
+    # Convert https to http and port-1 for the API endpoint, or just try as-is
+    remote_url = f"{target_link}/jobs/{job_id}"
+    
+    # Also try HTTP variant (the remote brik typically serves on HTTP)
+    http_url = remote_url.replace("https://", "http://")
+    # Adjust port: if HTTPS port (e.g. 6133), the HTTP port is one less (6132)
+    try:
+        parts = http_url.split(":")
+        if len(parts) == 3:  # http://domain:port/path
+            port_and_path = parts[2]
+            port_str = port_and_path.split("/")[0]
+            port = int(port_str)
+            http_port = port - 1  # HTTP is one below HTTPS
+            http_url = f"{parts[0]}:{parts[1]}:{http_port}/{'/'.join(port_and_path.split('/')[1:])}"
+    except (ValueError, IndexError):
+        pass
+
+    # Try HTTP first (as shown in user's curl example), then HTTPS
+    for url in [http_url, remote_url]:
+        try:
+            resp = http_requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                remote_status = data.get('status', '')
+                local_status = REMOTE_STATUS_MAP.get(remote_status, remote_status)
+                exit_code = data.get('exit_code')
+                
+                # Update local DB if status changed from pending/running
+                if local_status in ('completed', 'failed', 'timeout'):
+                    try:
+                        db_manager.execute_query(
+                            '''UPDATE serverless_jobs 
+                               SET status = %s, exit_code = %s, completed_at = CURRENT_TIMESTAMP
+                               WHERE id = %s AND status IN ('pending', 'running')''',
+                            (local_status, exit_code, job_id)
+                        )
+                        # Store stdout/stderr in job_logs if available
+                        stdout = data.get('stdout', '')
+                        stderr = data.get('stderr', '')
+                        if stdout:
+                            db_manager.execute_query(
+                                '''INSERT INTO serverless_job_logs (job_id, stream, content)
+                                   VALUES (%s, %s, %s)
+                                   ON CONFLICT DO NOTHING''',
+                                (job_id, 'stdout', stdout)
+                            )
+                        if stderr:
+                            db_manager.execute_query(
+                                '''INSERT INTO serverless_job_logs (job_id, stream, content)
+                                   VALUES (%s, %s, %s)
+                                   ON CONFLICT DO NOTHING''',
+                                (job_id, 'stderr', stderr)
+                            )
+                    except Exception as e:
+                        logger.warning(f"Failed to update local DB for job {job_id}: {e}")
+                elif local_status == 'running':
+                    try:
+                        db_manager.execute_query(
+                            '''UPDATE serverless_jobs 
+                               SET status = %s, started_at = COALESCE(started_at, CURRENT_TIMESTAMP)
+                               WHERE id = %s AND status = 'pending' ''',
+                            (local_status, job_id)
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to update running status for job {job_id}: {e}")
+                
+                return data
+        except Exception as e:
+            logger.debug(f"Failed to reach remote endpoint {url}: {e}")
+            continue
+    
+    return None
+
+
 @serverless_bp.route('/serverless-links', methods=['GET'])
 def get_serverless_links():
-    """Get all opcp-serverless-brik endpoint links across all users."""
+    """Get all opcp-serverless-brik endpoint links with availability status."""
     # Auth check
     user_id = session.get('user_id')
     if not user_id:
@@ -66,7 +165,7 @@ def get_serverless_links():
             if all_links:
                 for row in all_links:
                     username, https_port = row
-                    result_links.append(f"https://{DOMAIN}:{https_port}")
+                    result_links.append({"url": f"https://{DOMAIN}:{https_port}", "username": username})
         except Exception as e:
             logger.warning(f"Failed to query user_applications for serverless links: {e}")
 
@@ -87,23 +186,41 @@ def get_serverless_links():
                         for u_row in users:
                             uid, username = u_row
                             _, https_port, _, _ = calculate_app_ports(uid, app_id)
-                            result_links.append(f"https://{DOMAIN}:{https_port}")
+                            result_links.append({"url": f"https://{DOMAIN}:{https_port}", "username": username})
             except Exception as e:
                 logger.warning(f"Failed to compute serverless links from app ports: {e}")
 
-        # Last resort: if still empty, generate a default link for admin (user_id=1)
+        # Last resort: if still empty, generate a default link for admin
         if not result_links:
-            # Use a reasonable default port based on typical admin assignment
-            # admin is typically user_id=1, and opcp-serverless-brik is app_id=8
-            # Calculate: RANGE_START(6000) + 1*RANGE_RESERVED(100) + 8*RANGE_PORTS_PER_APPLICATION(4) = 6132, HTTPS=6133
-            result_links.append(f"https://{DOMAIN}:6133")
+            result_links.append({"url": f"https://{DOMAIN}:6133", "username": "admin"})
+
+        # Determine availability status for each link
+        # A brik is OCCUPIED if there's a pending or running job targeting it
+        for link_obj in result_links:
+            link_url = link_obj["url"]
+            try:
+                active_job = db_manager.execute_query(
+                    '''SELECT id FROM serverless_jobs
+                       WHERE target_link = %s AND status IN ('pending', 'running')
+                       LIMIT 1''',
+                    (link_url,), fetch_one=True
+                )
+                if active_job:
+                    link_obj["status"] = "OCCUPIED"
+                else:
+                    link_obj["status"] = "AVAILABLE"
+            except Exception:
+                link_obj["status"] = "UNKNOWN"
+
+        # Build response: return both the structured links and a flat list for backward compat
+        links_flat = [link_obj["url"] for link_obj in result_links]
 
         logger.info(f"Serverless links retrieved: user_id={user_id}, count={len(result_links)}")
-        return jsonify({"links": result_links}), 200
+        return jsonify({"links": links_flat, "endpoints": result_links}), 200
 
     except Exception as e:
         logger.error(f"Failed to retrieve serverless links: {e}")
-        return jsonify({"error": "Failed to retrieve links", "links": []}), 500
+        return jsonify({"error": "Failed to retrieve links", "links": [], "endpoints": []}), 500
 
 
 @serverless_bp.route('/jobs', methods=['POST'])
@@ -255,17 +372,30 @@ def list_jobs():
     jobs_list = []
     if jobs:
         for job in jobs:
+            job_id_val = str(job[0])
+            job_status = job[3]
+            job_target_link = job[9]
+            job_exit_code = job[7]
+
+            # Sync status from remote endpoint if job is still pending or running
+            if job_status in ('pending', 'running') and job_target_link:
+                remote_data = sync_job_from_remote(job_id_val, job_target_link)
+                if remote_data:
+                    remote_status = remote_data.get('status', '')
+                    job_status = REMOTE_STATUS_MAP.get(remote_status, job_status)
+                    job_exit_code = remote_data.get('exit_code', job_exit_code)
+
             jobs_list.append({
-                "job_id": str(job[0]),
+                "job_id": job_id_val,
                 "user_id": job[1],
                 "image": job[2],
-                "status": job[3],
+                "status": job_status,
                 "created_at": job[4].isoformat() + 'Z' if job[4] else None,
                 "started_at": job[5].isoformat() + 'Z' if job[5] else None,
                 "completed_at": job[6].isoformat() + 'Z' if job[6] else None,
-                "exit_code": job[7],
+                "exit_code": job_exit_code,
                 "worker_id": job[8],
-                "target_link": job[9],
+                "target_link": job_target_link,
             })
 
     response_data = {
@@ -363,7 +493,7 @@ def get_job_status(job_id):
     # Query job by ID
     try:
         job = db_manager.execute_query(
-            '''SELECT id, user_id, image, status, created_at, started_at, completed_at, exit_code, worker_id
+            '''SELECT id, user_id, image, status, created_at, started_at, completed_at, exit_code, worker_id, target_link
                FROM serverless_jobs WHERE id = %s''',
             (job_id,),
             fetch_one=True
@@ -382,15 +512,27 @@ def get_job_status(job_id):
     if job_user_id != user_id and not is_admin:
         return jsonify({"error": "Access denied"}), 403
 
+    job_status = job[3]
+    job_exit_code = job[7]
+    target_link = job[9]
+
+    # Sync status from remote if still pending/running
+    if job_status in ('pending', 'running') and target_link:
+        remote_data = sync_job_from_remote(job_id, target_link)
+        if remote_data:
+            remote_status = remote_data.get('status', '')
+            job_status = REMOTE_STATUS_MAP.get(remote_status, job_status)
+            job_exit_code = remote_data.get('exit_code', job_exit_code)
+
     # Build response
     response_data = {
         "job_id": str(job[0]),
-        "status": job[3],
+        "status": job_status,
         "image": job[2],
         "created_at": job[4].isoformat() + 'Z' if job[4] else None,
         "started_at": job[5].isoformat() + 'Z' if job[5] else None,
         "completed_at": job[6].isoformat() + 'Z' if job[6] else None,
-        "exit_code": job[7],
+        "exit_code": job_exit_code,
         "worker_id": job[8],
     }
 
@@ -413,7 +555,7 @@ def get_job_result(job_id):
     # Query job by ID
     try:
         job = db_manager.execute_query(
-            '''SELECT id, user_id, status, exit_code
+            '''SELECT id, user_id, status, exit_code, target_link
                FROM serverless_jobs WHERE id = %s''',
             (job_id,),
             fetch_one=True
@@ -432,13 +574,45 @@ def get_job_result(job_id):
     if job_user_id != user_id and not is_admin:
         return jsonify({"error": "Access denied"}), 403
 
+    job_status = job[2]
+    target_link = job[4]
+
+    # If job is still pending/running locally, try syncing from remote first
+    if job_status in ('pending', 'running') and target_link:
+        remote_data = sync_job_from_remote(job_id, target_link)
+        if remote_data:
+            remote_status = remote_data.get('status', '')
+            job_status = REMOTE_STATUS_MAP.get(remote_status, job_status)
+            # If remote shows completed, return the result directly from remote data
+            if job_status in ('completed', 'failed', 'timeout'):
+                response_data = {
+                    "exit_code": remote_data.get('exit_code'),
+                    "stdout": remote_data.get('stdout', ''),
+                    "stderr": remote_data.get('stderr', ''),
+                    "result": None,
+                }
+                logger.info(f"Job result retrieved from remote: job_id={job_id}, user_id={user_id}")
+                return jsonify(response_data), 200
+
     # Verify job is in terminal state
     terminal_states = ('completed', 'failed', 'timeout', 'cancelled')
-    job_status = job[2]
     if job_status not in terminal_states:
         return jsonify({"error": "Job is still in progress"}), 409
 
-    # Query job logs (stdout and stderr) ordered by created_at
+    # Try fetching result from remote endpoint first
+    if target_link:
+        remote_data = sync_job_from_remote(job_id, target_link)
+        if remote_data and remote_data.get('stdout') is not None:
+            response_data = {
+                "exit_code": remote_data.get('exit_code', job[3]),
+                "stdout": remote_data.get('stdout', ''),
+                "stderr": remote_data.get('stderr', ''),
+                "result": None,
+            }
+            logger.info(f"Job result retrieved from remote: job_id={job_id}, user_id={user_id}")
+            return jsonify(response_data), 200
+
+    # Fallback: Query local job logs (stdout and stderr) ordered by created_at
     try:
         logs = db_manager.execute_query(
             '''SELECT stream, content FROM serverless_job_logs
