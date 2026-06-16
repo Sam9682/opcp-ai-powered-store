@@ -25,12 +25,12 @@ The Serverless Orchestration module provides on-demand, ephemeral Docker contain
 
 ### Components
 
-| Component | Role |
-|-----------|------|
-| **REST API** | Accepts job submissions, returns status and results |
+|         Component        |                                        Role                                             |
+|--------------------------|-----------------------------------------------------------------------------------------|
+| **REST API**             | Accepts job submissions, returns status and results                                     |
 | **PostgreSQL Job Queue** | Stores jobs with state machine (pending → running → completed/failed/timeout/cancelled) |
-| **Worker Service** | Polls the queue, claims jobs, executes containers, captures output |
-| **Container Runtime** | Abstract layer supporting Docker and Podman with full security hardening |
+| **Worker Service**       | Polls the queue, claims jobs, executes containers, captures output                      |
+| **Container Runtime**    | Abstract layer supporting Docker and Podman with full security hardening                |
 
 ---
 

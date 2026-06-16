@@ -103,6 +103,88 @@ python3 ./scripts/aipoweredstore_cli.py init-db
 python3 src/ControlPlanFlaskApp_postgres.py
 ```
 
+### Bare-Metal Installation (Ubuntu/Debian)
+
+For a fresh bare-metal server running Ubuntu 22.04+ or Debian 12+, the `init_pltf.sh` script automates the complete platform provisioning. This is the recommended method for production deployments on OVHcloud dedicated servers or VPS.
+
+#### Prerequisites
+
+| Requirement | Details |
+|-------------|---------|
+| OS | Ubuntu 22.04+ or Debian 12+ |
+| User | Non-root user with `sudo` privileges |
+| Network | Internet access (public interface) |
+| SSH key | Configured for GitHub repository access |
+| GPU (optional) | NVIDIA H100, A100, or A30 for MIG shared GPU |
+
+#### Run the provisioning script
+
+```bash
+chmod +x init_pltf.sh
+./init_pltf.sh
+```
+
+#### What the script installs (in order)
+
+| Step | Component | Purpose |
+|------|-----------|---------|
+| 1 | Python 3, pip, venv, net-tools, unzip | Application runtime and system utilities |
+| 2 | Amazon Kiro CLI | AI-assisted development CLI |
+| 3 | OVH shai CLI | OVHcloud infrastructure management |
+| 4 | AWS CLI v2 | S3-compatible object storage access |
+| 5 | Terraform 1.14.5 | Infrastructure as Code |
+| 6 | Network configuration | Netplan route metrics (public: 50, private: 200) |
+| 7 | Docker + docker-compose | Container orchestration engine |
+| 8 | NVIDIA Driver 550 + MIG mode | GPU compute and Multi-Instance GPU partitioning |
+| 9 | NVIDIA Container Toolkit | Docker GPU passthrough (`--gpus` flag) |
+| 10 | AWS credentials | S3 endpoint configuration for OVHcloud |
+| 11 | Repository clone | Source code + submodules |
+| 12 | Python virtualenv | Dependencies from requirements.txt |
+| 13 | Final setup | logs/ directory, ModSecurity config, deployments/ |
+
+#### GPU setup detail
+
+The script automatically handles GPU provisioning with graceful fallback:
+
+```
+NVIDIA driver install
+    ├── Success → Enable MIG mode (nvidia-smi -mig 1)
+    │                ├── Success → Install nvidia-container-toolkit
+    │                │                 └── Verify Docker GPU access (30s timeout)
+    │                └── Warning → GPU may not support MIG, continue
+    └── Warning → No GPU detected, skip GPU setup entirely
+```
+
+All GPU steps are **non-blocking** — the platform works without GPU hardware.
+
+#### Post-installation (manual steps)
+
+After `init_pltf.sh` completes, configure these items:
+
+```bash
+# 1. Platform identity
+vim ~/opcp-ai-powered-store/conf/deploy.ini
+# Set: DOMAIN=yourdomain.com
+# Set: PLTF_NAME=Your Platform Name
+
+# 2. SSL certificates
+cp fullchain.crt ~/opcp-ai-powered-store/ssl/fullchain_domain.crt
+cp private.key ~/opcp-ai-powered-store/ssl/privateKey_domain.key
+
+# 3. S3 credentials for backups
+vim ~/.aws/credentials
+# Replace XXX/YYY with your OVHcloud S3 access/secret keys
+
+# 4. Apply Docker group (required for docker commands without sudo)
+newgrp docker
+# Or log out and back in
+
+# 5. Start the platform
+cd ~/opcp-ai-powered-store
+source .venv/bin/activate
+./deployControlPlan.sh start
+```
+
 ## Configuration
 
 ### Environment Variables
