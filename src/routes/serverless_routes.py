@@ -39,7 +39,7 @@ serverless_bp = Blueprint('serverless', __name__, url_prefix='/api')
 
 @serverless_bp.route('/serverless-links', methods=['GET'])
 def get_serverless_links():
-    """Get the available links (URLs) for the opcp-serverless-brik application for the current user."""
+    """Get all running opcp-serverless-brik endpoint links across all users."""
     # Auth check
     user_id = session.get('user_id')
     if not user_id:
@@ -48,36 +48,44 @@ def get_serverless_links():
     logger.info(f"GET /api/serverless-links - Request received: user_id={user_id}")
 
     try:
-        # Query the user_applications table for the opcp-serverless-brik application
-        links = db_manager.execute_query('''
-            SELECT ua.url, ua.http_port, ua.https_port, ua.http_port2, ua.https_port2
-            FROM user_applications ua
-            JOIN applications a ON ua.application_id = a.id
-            WHERE ua.user_id = %s AND a.name = %s
-        ''', (user_id, 'opcp-serverless-brik'), fetch_all=True)
-
-        # Build HTTP links from port information
-        # Get the domain from configuration
         from ..database_postgres import DOMAIN
+
+        # Query all running deployments of opcp-serverless-brik across all users
+        # Join with user_applications to get port info and users to get username
+        running_links = db_manager.execute_query('''
+            SELECT u.username, ua.https_port, ua.http_port, d.swautomorph_url
+            FROM deployments d
+            JOIN users u ON d.user_id = u.id
+            JOIN applications a ON d.application_name = a.name
+            JOIN user_applications ua ON ua.user_id = d.user_id AND ua.application_id = a.id
+            WHERE a.name = %s AND UPPER(d.status) IN ('RUNNING', 'STARTED')
+            ORDER BY u.username
+        ''', ('opcp-serverless-brik',), fetch_all=True)
+
         result_links = []
 
-        if links:
-            for link in links:
-                url, http_port, https_port, http_port2, https_port2 = link
-                if http_port:
-                    result_links.append(f"http://{DOMAIN}:{http_port}")
-                if http_port2:
-                    result_links.append(f"http://{DOMAIN}:{http_port2}")
+        if running_links:
+            for row in running_links:
+                username, https_port, http_port, swautomorph_url = row
+                # Build the HTTPS link using domain and HTTPS port
+                if https_port:
+                    result_links.append(f"https://{DOMAIN}:{https_port}")
         else:
-            # Fallback: check if there are any deployments with URLs for this app
-            deployments = db_manager.execute_query('''
-                SELECT swautomorph_url FROM deployments
-                WHERE user_id = %s AND application_name = %s AND swautomorph_url IS NOT NULL
-            ''', (user_id, 'opcp-serverless-brik'), fetch_all=True)
-            if deployments:
-                for dep in deployments:
-                    if dep[0]:
-                        result_links.append(dep[0])
+            # Fallback: get all user_applications entries for opcp-serverless-brik
+            # (even if deployment status is unknown)
+            all_links = db_manager.execute_query('''
+                SELECT u.username, ua.https_port
+                FROM user_applications ua
+                JOIN applications a ON ua.application_id = a.id
+                JOIN users u ON ua.user_id = u.id
+                WHERE a.name = %s AND ua.https_port IS NOT NULL
+                ORDER BY u.username
+            ''', ('opcp-serverless-brik',), fetch_all=True)
+
+            if all_links:
+                for row in all_links:
+                    username, https_port = row
+                    result_links.append(f"https://{DOMAIN}:{https_port}")
 
         logger.info(f"Serverless links retrieved: user_id={user_id}, count={len(result_links)}")
         return jsonify({"links": result_links}), 200
