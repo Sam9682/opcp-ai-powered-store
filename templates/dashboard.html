@@ -799,6 +799,14 @@
             <button class="btn btn-secondary" onclick="refreshJobList()">🔄 Refresh</button>
         </div>
 
+        <!-- Available Serverless Links Panel -->
+        <div id="serverlessLinksPanel" style="margin-bottom: 20px; padding: 15px; background: #eef6ff; border-radius: 5px; border: 1px solid #b8daff;">
+            <h3 style="margin-top: 0;">🔗 opcp-serverless-brik Endpoints</h3>
+            <div id="serverlessLinksContent">
+                <p>Loading available endpoints...</p>
+            </div>
+        </div>
+
         <!-- Metrics Summary Panel -->
         <div id="serverlessMetricsPanel" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; border: 1px solid #ddd;">
             <h3 style="margin-top: 0;">📊 Metrics</h3>
@@ -811,6 +819,13 @@
         <div class="user-form" style="display: block; margin-bottom: 20px;">
             <h3>Submit New Job</h3>
             <form id="serverlessJobForm" onsubmit="event.preventDefault(); submitServerlessJob();">
+                <div class="form-group">
+                    <label for="serverlessTargetLink">Target Endpoint (required):</label>
+                    <select id="serverlessTargetLink" required>
+                        <option value="">-- Loading links... --</option>
+                    </select>
+                    <small style="color: #666;">Select the opcp-serverless-brik endpoint to run the job on</small>
+                </div>
                 <div class="form-group">
                     <label for="serverlessImage">Image (required):</label>
                     <input type="text" id="serverlessImage" placeholder="e.g. docker.io/library/python:3.11" required>
@@ -839,13 +854,14 @@
                     <tr>
                         <th>ID</th>
                         <th>Image</th>
+                        <th>Target</th>
                         <th>Status</th>
                         <th>Created At</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="serverlessJobsBody">
-                    <tr><td colspan="5">No jobs loaded yet. Click Refresh to load.</td></tr>
+                    <tr><td colspan="6">No jobs loaded yet. Click Refresh to load.</td></tr>
                 </tbody>
             </table>
         </div>

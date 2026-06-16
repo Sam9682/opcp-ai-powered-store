@@ -37,6 +37,56 @@ logger.propagate = False
 serverless_bp = Blueprint('serverless', __name__, url_prefix='/api')
 
 
+@serverless_bp.route('/serverless-links', methods=['GET'])
+def get_serverless_links():
+    """Get the available links (URLs) for the opcp-serverless-brik application for the current user."""
+    # Auth check
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "Authentication required"}), 401
+
+    logger.info(f"GET /api/serverless-links - Request received: user_id={user_id}")
+
+    try:
+        # Query the user_applications table for the opcp-serverless-brik application
+        links = db_manager.execute_query('''
+            SELECT ua.url, ua.http_port, ua.https_port, ua.http_port2, ua.https_port2
+            FROM user_applications ua
+            JOIN applications a ON ua.application_id = a.id
+            WHERE ua.user_id = %s AND a.name = %s
+        ''', (user_id, 'opcp-serverless-brik'), fetch_all=True)
+
+        # Build HTTP links from port information
+        # Get the domain from configuration
+        from ..database_postgres import DOMAIN
+        result_links = []
+
+        if links:
+            for link in links:
+                url, http_port, https_port, http_port2, https_port2 = link
+                if http_port:
+                    result_links.append(f"http://{DOMAIN}:{http_port}")
+                if http_port2:
+                    result_links.append(f"http://{DOMAIN}:{http_port2}")
+        else:
+            # Fallback: check if there are any deployments with URLs for this app
+            deployments = db_manager.execute_query('''
+                SELECT swautomorph_url FROM deployments
+                WHERE user_id = %s AND application_name = %s AND swautomorph_url IS NOT NULL
+            ''', (user_id, 'opcp-serverless-brik'), fetch_all=True)
+            if deployments:
+                for dep in deployments:
+                    if dep[0]:
+                        result_links.append(dep[0])
+
+        logger.info(f"Serverless links retrieved: user_id={user_id}, count={len(result_links)}")
+        return jsonify({"links": result_links}), 200
+
+    except Exception as e:
+        logger.error(f"Failed to retrieve serverless links: {e}")
+        return jsonify({"error": "Failed to retrieve links"}), 500
+
+
 @serverless_bp.route('/jobs', methods=['POST'])
 def submit_job():
     """Submit a new serverless Docker execution job."""
@@ -77,6 +127,11 @@ def submit_job():
     if timeout < 1 or timeout > 3600:
         return jsonify({"error": "Field 'timeout' must be between 1 and 3600 seconds"}), 400
 
+    # Validate target_link (required - must select a serverless endpoint)
+    target_link = data.get('target_link')
+    if not target_link or not isinstance(target_link, str):
+        return jsonify({"error": "Field 'target_link' is required and must be a string"}), 400
+
     # Validate image against registry whitelist
     whitelist = SERVERLESS_CONFIG['registry_whitelist']
     if not validate_image_registry(image, whitelist):
@@ -85,10 +140,10 @@ def submit_job():
     # Insert job record into database
     try:
         result = db_manager.execute_query(
-            '''INSERT INTO serverless_jobs (user_id, image, command, environment, timeout_seconds, status)
-               VALUES (%s, %s, %s, %s, %s, %s)
+            '''INSERT INTO serverless_jobs (user_id, image, command, environment, timeout_seconds, status, target_link)
+               VALUES (%s, %s, %s, %s, %s, %s, %s)
                RETURNING id''',
-            (user_id, image, json.dumps(command), json.dumps(env), timeout, 'pending'),
+            (user_id, image, json.dumps(command), json.dumps(env), timeout, 'pending', target_link),
             fetch_one=True
         )
         job_id = str(result[0])
@@ -96,7 +151,7 @@ def submit_job():
         logger.error(f"Failed to insert job record: {e}")
         return jsonify({"error": "Failed to create job"}), 500
 
-    logger.info(f"Job submitted: job_id={job_id}, user_id={user_id}, image={image}")
+    logger.info(f"Job submitted: job_id={job_id}, user_id={user_id}, image={image}, target_link={target_link}")
 
     return jsonify({"job_id": job_id}), 201
 
@@ -166,7 +221,7 @@ def list_jobs():
         offset = (page - 1) * per_page
 
         # Get paginated jobs
-        jobs_query = f'''SELECT id, user_id, image, status, created_at, started_at, completed_at, exit_code, worker_id
+        jobs_query = f'''SELECT id, user_id, image, status, created_at, started_at, completed_at, exit_code, worker_id, target_link
                          FROM serverless_jobs {where_clause}
                          ORDER BY created_at DESC
                          LIMIT %s OFFSET %s'''
@@ -191,6 +246,7 @@ def list_jobs():
                 "completed_at": job[6].isoformat() + 'Z' if job[6] else None,
                 "exit_code": job[7],
                 "worker_id": job[8],
+                "target_link": job[9],
             })
 
     response_data = {

@@ -10,6 +10,8 @@ let serverlessRefreshInterval = null;
  */
 function startServerlessAutoRefresh() {
     stopServerlessAutoRefresh();
+    // Load available links on tab activation
+    loadServerlessLinks();
     serverlessRefreshInterval = setInterval(function() {
         refreshJobList();
         loadServerlessMetrics();
@@ -27,16 +29,74 @@ function stopServerlessAutoRefresh() {
 }
 
 /**
+ * Load available opcp-serverless-brik endpoint links into the target dropdown
+ * and display them in the links panel.
+ */
+async function loadServerlessLinks() {
+    const select = document.getElementById('serverlessTargetLink');
+    const linksContent = document.getElementById('serverlessLinksContent');
+
+    try {
+        const response = await fetch('/api/serverless-links', {
+            method: 'GET',
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            if (select) select.innerHTML = '<option value="">-- Failed to load links --</option>';
+            if (linksContent) linksContent.innerHTML = '<p style="color:red;">Failed to load endpoints.</p>';
+            return;
+        }
+
+        const data = await response.json();
+        const links = data.links || [];
+
+        if (links.length === 0) {
+            if (select) select.innerHTML = '<option value="">-- No endpoints available --</option>';
+            if (linksContent) linksContent.innerHTML = '<p style="color:orange;">No opcp-serverless-brik endpoints are currently assigned. Please contact your administrator.</p>';
+            return;
+        }
+
+        // Populate dropdown
+        if (select) {
+            let selectHtml = '<option value="">-- Select target endpoint --</option>';
+            for (const link of links) {
+                selectHtml += '<option value="' + link + '">' + link + '</option>';
+            }
+            select.innerHTML = selectHtml;
+        }
+
+        // Populate links panel
+        if (linksContent) {
+            let panelHtml = '<ul style="list-style: none; padding: 0; margin: 0;">';
+            for (const link of links) {
+                panelHtml += '<li style="margin-bottom: 5px;"><a href="' + link + '" target="_blank" style="color:#007bff; text-decoration:none;">🌐 ' + link + '</a></li>';
+            }
+            panelHtml += '</ul>';
+            linksContent.innerHTML = panelHtml;
+        }
+    } catch (err) {
+        if (select) select.innerHTML = '<option value="">-- Error loading links --</option>';
+        if (linksContent) linksContent.innerHTML = '<p style="color:red;">Network error: ' + err.message + '</p>';
+    }
+}
+
+/**
  * Submit a serverless Docker job via POST /api/jobs.
  * Reads form inputs, builds the payload, and refreshes the job list on success.
  */
 async function submitServerlessJob() {
+    const targetLink = document.getElementById('serverlessTargetLink').value;
     const image = document.getElementById('serverlessImage').value.trim();
     const commandStr = document.getElementById('serverlessCommand').value.trim();
     const envStr = document.getElementById('serverlessEnv').value.trim();
     const timeoutStr = document.getElementById('serverlessTimeout').value.trim();
 
     // Validate required fields
+    if (!targetLink) {
+        alert('Error: You must select a target endpoint.');
+        return;
+    }
     if (!image) {
         alert('Error: Docker image is required.');
         return;
@@ -52,7 +112,8 @@ async function submitServerlessJob() {
     // Build the request payload
     const payload = {
         image: image,
-        command: command
+        command: command,
+        target_link: targetLink
     };
 
     // Parse environment variables JSON if provided
@@ -91,6 +152,8 @@ async function submitServerlessJob() {
             alert('Job submitted successfully! Job ID: ' + data.job_id);
             // Reset the form
             document.getElementById('serverlessJobForm').reset();
+            // Re-load links after form reset (reset clears the dropdown)
+            loadServerlessLinks();
             // Refresh the job list
             if (typeof refreshJobList === 'function') {
                 refreshJobList();
@@ -201,7 +264,7 @@ async function refreshJobList() {
         });
 
         if (!response.ok) {
-            tbody.innerHTML = '<tr><td colspan="5">Failed to load jobs (HTTP ' + response.status + ')</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">Failed to load jobs (HTTP ' + response.status + ')</td></tr>';
             return;
         }
 
@@ -209,7 +272,7 @@ async function refreshJobList() {
         const jobs = data.jobs || [];
 
         if (jobs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5">No jobs found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6">No jobs found</td></tr>';
             return;
         }
 
@@ -217,15 +280,17 @@ async function refreshJobList() {
         for (const job of jobs) {
             const createdAt = job.created_at ? new Date(job.created_at).toLocaleString() : 'N/A';
             const statusBadge = '<span class="job-status-badge status-' + job.status + '">' + job.status + '</span>';
+            const targetLink = job.target_link || 'N/A';
 
-            let actions = '<button class="btn btn-secondary btn-small" onclick="viewJobDetail(\'' + job.id + '\')">View</button>';
+            let actions = '<button class="btn btn-secondary btn-small" onclick="viewJobDetail(\'' + job.job_id + '\')">View</button>';
             if (job.status === 'pending' || job.status === 'running') {
-                actions += ' <button class="btn btn-danger btn-small" onclick="cancelJob(\'' + job.id + '\')">Cancel</button>';
+                actions += ' <button class="btn btn-danger btn-small" onclick="cancelJob(\'' + job.job_id + '\')">Cancel</button>';
             }
 
             html += '<tr>';
-            html += '<td>' + job.id + '</td>';
+            html += '<td>' + job.job_id + '</td>';
             html += '<td>' + job.image + '</td>';
+            html += '<td><a href="' + targetLink + '" target="_blank" style="color:#007bff;">' + targetLink + '</a></td>';
             html += '<td>' + statusBadge + '</td>';
             html += '<td>' + createdAt + '</td>';
             html += '<td>' + actions + '</td>';
@@ -234,7 +299,7 @@ async function refreshJobList() {
 
         tbody.innerHTML = html;
     } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="5">Network error loading jobs: ' + err.message + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6">Network error loading jobs: ' + err.message + '</td></tr>';
     }
 }
 
