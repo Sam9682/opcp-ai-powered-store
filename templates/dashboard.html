@@ -831,8 +831,8 @@
                     <input type="text" id="serverlessImage" placeholder="e.g. docker.io/library/python:3.11" required>
                 </div>
                 <div class="form-group">
-                    <label for="serverlessCommand">Command (required, space-separated):</label>
-                    <textarea id="serverlessCommand" rows="10" placeholder="e.g. python script.py --flag" required></textarea>
+                    <label for="serverlessCommand">Command (required, one command per line):</label>
+                    <textarea id="serverlessCommand" rows="10" placeholder="e.g.&#10;python script.py --flag&#10;echo hello world" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="serverlessEnv">Environment Variables (JSON, optional):</label>

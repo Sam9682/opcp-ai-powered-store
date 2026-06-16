@@ -32,10 +32,14 @@ function stopServerlessAutoRefresh() {
 /**
  * Load available opcp-serverless-brik endpoint links into the target dropdown
  * and display them in the links panel with availability status.
+ * Preserves the currently selected value in the dropdown.
  */
 async function loadServerlessLinks() {
     const select = document.getElementById('serverlessTargetLink');
     const linksContent = document.getElementById('serverlessLinksContent');
+
+    // Preserve current selection before rebuilding
+    const previousSelection = select ? select.value : '';
 
     try {
         const response = await fetch('/api/serverless-links', {
@@ -67,7 +71,8 @@ async function loadServerlessLinks() {
                 for (const ep of endpoints) {
                     const statusLabel = ep.status === 'AVAILABLE' ? '✅' : ep.status === 'OCCUPIED' ? '🔒' : '❓';
                     const disabled = ep.status === 'OCCUPIED' ? ' disabled' : '';
-                    selectHtml += '<option value="' + ep.url + '"' + disabled + '>' + statusLabel + ' ' + ep.url + ' (' + ep.username + ') - ' + ep.status + '</option>';
+                    const selected = (ep.url === previousSelection) ? ' selected' : '';
+                    selectHtml += '<option value="' + ep.url + '"' + disabled + selected + '>' + statusLabel + ' ' + ep.url + ' (' + ep.username + ') - ' + ep.status + '</option>';
                 }
                 select.innerHTML = selectHtml;
             }
@@ -99,7 +104,8 @@ async function loadServerlessLinks() {
             if (select) {
                 let selectHtml = '<option value="">-- Select target endpoint --</option>';
                 for (const link of links) {
-                    selectHtml += '<option value="' + link + '">' + link + '</option>';
+                    const selected = (link === previousSelection) ? ' selected' : '';
+                    selectHtml += '<option value="' + link + '"' + selected + '>' + link + '</option>';
                 }
                 select.innerHTML = selectHtml;
             }
@@ -143,8 +149,10 @@ async function submitServerlessJob() {
         return;
     }
 
-    // Parse command string into array by splitting on spaces
-    const command = commandStr.split(/\s+/);
+    // Parse command: each line is a separate command entry
+    // Split by newlines, trim each line, filter out empty lines
+    const lines = commandStr.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+    const command = lines;
 
     // Build the request payload
     const payload = {
