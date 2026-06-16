@@ -411,6 +411,60 @@ def init_db():
                 conn.rollback()
                 print(f"[INFO] Target link migration check: {e}")
 
+            # Ensure opcp-serverless-brik application exists and is assigned to all users
+            try:
+                cursor.execute("SELECT id FROM applications WHERE name = %s", ('opcp-serverless-brik',))
+                serverless_app = cursor.fetchone()
+                if not serverless_app:
+                    # Insert the application
+                    cursor.execute('''
+                        INSERT INTO applications (name, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id
+                    ''', ('opcp-serverless-brik', 'OPCP Serverless Docker Execution', 'https://github.com/Sam9682/opcp-serverless-brik.git', 10, 30, 30, 10, 1))
+                    serverless_app_id = cursor.fetchone()[0]
+                    # Insert default cost
+                    cursor.execute('INSERT INTO application_costs (application_id, cost_per_day) VALUES (%s, %s)', (serverless_app_id, 1.0))
+                else:
+                    serverless_app_id = serverless_app[0]
+
+                # Assign to all users that don't have it yet
+                cursor.execute('SELECT id FROM users')
+                all_users = cursor.fetchall()
+                for user_row in all_users:
+                    uid = user_row[0]
+                    cursor.execute('SELECT id FROM user_applications WHERE user_id = %s AND application_id = %s', (uid, serverless_app_id))
+                    if not cursor.fetchone():
+                        HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2 = calculate_app_ports(uid, serverless_app_id)
+                        url = f'https://www.{DOMAIN}:{HTTPS_PORT}'
+                        cursor.execute('''
+                            INSERT INTO user_applications (user_id, application_id, url, http_port, https_port, http_port2, https_port2)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                            ON CONFLICT (user_id, application_id) DO NOTHING
+                        ''', (uid, serverless_app_id, url, HTTP_PORT, HTTPS_PORT, HTTP_PORT2, HTTPS_PORT2))
+
+                # Ensure a deployment record exists for admin so the endpoint shows up
+                cursor.execute("SELECT id FROM users WHERE username = %s", ('admin',))
+                admin_row = cursor.fetchone()
+                if admin_row:
+                    admin_id = admin_row[0]
+                    cursor.execute("SELECT id FROM deployments WHERE user_id = %s AND application_name = %s", (admin_id, 'opcp-serverless-brik'))
+                    if not cursor.fetchone():
+                        cursor.execute("SELECT id FROM servers LIMIT 1")
+                        server_row = cursor.fetchone()
+                        server_id = server_row[0] if server_row else None
+                        swautomorph_url = f"https://{DOMAIN}/admin/opcp-serverless-brik"
+                        cursor.execute('''
+                            INSERT INTO deployments (user_id, application_id, application_name, status, server_id, swautomorph_url)
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        ''', (admin_id, serverless_app_id, 'opcp-serverless-brik', 'RUNNING', server_id, swautomorph_url))
+
+                conn.commit()
+                print("[INFO] opcp-serverless-brik application ensured for all users")
+            except Exception as e:
+                conn.rollback()
+                print(f"[INFO] opcp-serverless-brik setup check: {e}")
+
             # Insert default applications if none exist
             cursor.execute('SELECT COUNT(*) FROM applications')
             if cursor.fetchone()[0] == 0:

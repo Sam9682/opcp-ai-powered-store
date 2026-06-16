@@ -1498,3 +1498,125 @@
 2026-06-16 21:55:14,814 - src.routes.serverless_routes - INFO - Metrics retrieved by admin user_id=1
 2026-06-16 21:55:14,821 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
 2026-06-16 21:55:14,822 - src.routes.serverless_routes - ERROR - Failed to retrieve metrics: Connection refused
+2026-06-16 22:01:26,389 - src.routes.serverless_routes - WARNING - POST /api/jobs - Authentication failed: no user_id in session
+2026-06-16 22:01:26,401 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,402 - src.routes.serverless_routes - INFO - Job submitted: job_id=2d6bb2be-9c51-4cb5-b33f-e088805e744e, user_id=1, image=docker.io/python:3.11, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,408 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,416 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,423 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,430 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,437 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,445 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,451 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,458 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,467 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,477 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,485 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,486 - src.routes.serverless_routes - INFO - Job submitted: job_id=60896472-e25d-415d-9872-25fcec68b8c4, user_id=1, image=docker.io/python:3.11, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,494 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,496 - src.routes.serverless_routes - INFO - Job submitted: job_id=a082961a-00ef-4b2f-b874-4b6e893c2488, user_id=1, image=docker.io/python:3.11, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,503 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,511 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,512 - src.routes.serverless_routes - INFO - Job submitted: job_id=61b6196c-72ed-4075-89ff-895e807dd70d, user_id=1, image=python:3.11, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,521 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,522 - src.routes.serverless_routes - INFO - Job submitted: job_id=d3369df9-981d-480c-98bd-3f5b45db5518, user_id=1, image=ghcr.io/org/myapp:latest, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,532 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=42
+2026-06-16 22:01:26,533 - src.routes.serverless_routes - INFO - Job submitted: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42, image=docker.io/python:3.11, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,542 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=7
+2026-06-16 22:01:26,544 - src.routes.serverless_routes - INFO - Job submitted: job_id=66ea87d1-c0d3-4845-adec-92f4cb942380, user_id=7, image=registry.example.com/myapp:v1, target_link=http://opcp-psmc.com:6134
+2026-06-16 22:01:26,552 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,553 - src.routes.serverless_routes - INFO - Job submitted: job_id=8650c2a9-816d-491d-aa6c-e2cc203b0398, user_id=1, image=docker.io/alpine:latest, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,562 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,563 - src.routes.serverless_routes - INFO - Job submitted: job_id=f01fb77e-4f0f-47fe-8764-3800631c0f67, user_id=1, image=docker.io/alpine:latest, target_link=http://opcp-psmc.com:6132
+2026-06-16 22:01:26,573 - src.routes.serverless_routes - INFO - POST /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,574 - src.routes.serverless_routes - ERROR - Failed to insert job record: Connection refused
+2026-06-16 22:01:26,583 - src.routes.serverless_routes - WARNING - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Authentication failed: no user_id in session
+2026-06-16 22:01:26,590 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,602 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,612 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,614 - src.routes.serverless_routes - INFO - Job status retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,625 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,626 - src.routes.serverless_routes - INFO - Job status retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=1
+2026-06-16 22:01:26,634 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,636 - src.routes.serverless_routes - INFO - Job status retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,645 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,647 - src.routes.serverless_routes - INFO - Job status retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,655 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000 - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,657 - src.routes.serverless_routes - ERROR - Failed to query job 550e8400-e29b-41d4-a716-446655440000: Connection refused
+2026-06-16 22:01:26,664 - src.routes.serverless_routes - WARNING - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Authentication failed: no user_id in session
+2026-06-16 22:01:26,672 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,683 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,691 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,693 - src.routes.serverless_routes - INFO - Job result retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=1
+2026-06-16 22:01:26,702 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,709 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,718 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,719 - src.routes.serverless_routes - INFO - Job result retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,729 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,730 - src.routes.serverless_routes - INFO - Job result retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,738 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,740 - src.routes.serverless_routes - INFO - Job result retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,748 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,749 - src.routes.serverless_routes - INFO - Job result retrieved: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,758 - src.routes.serverless_routes - INFO - GET /api/jobs/550e8400-e29b-41d4-a716-446655440000/result - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,759 - src.routes.serverless_routes - ERROR - Failed to query job 550e8400-e29b-41d4-a716-446655440000: Connection refused
+2026-06-16 22:01:26,766 - src.routes.serverless_routes - WARNING - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Authentication failed: no user_id in session
+2026-06-16 22:01:26,774 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,784 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,795 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=1, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,797 - src.routes.serverless_routes - INFO - Job cancelled: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=1
+2026-06-16 22:01:26,808 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,818 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,828 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,837 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,848 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,849 - src.routes.serverless_routes - INFO - Job cancelled: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,857 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,859 - src.routes.serverless_routes - INFO - Job cancelled: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,868 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,869 - src.routes.serverless_routes - INFO - Job cancelled: job_id=550e8400-e29b-41d4-a716-446655440000, user_id=42
+2026-06-16 22:01:26,878 - src.routes.serverless_routes - INFO - POST /api/jobs/550e8400-e29b-41d4-a716-446655440000/cancel - Request received: user_id=42, job_id=550e8400-e29b-41d4-a716-446655440000
+2026-06-16 22:01:26,879 - src.routes.serverless_routes - ERROR - Failed to cancel job 550e8400-e29b-41d4-a716-446655440000: Connection refused
+2026-06-16 22:01:26,887 - src.routes.serverless_routes - WARNING - GET /api/jobs - Authentication failed: no user_id in session
+2026-06-16 22:01:26,897 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,899 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=0
+2026-06-16 22:01:26,909 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,911 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=50
+2026-06-16 22:01:26,920 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,921 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=50
+2026-06-16 22:01:26,929 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,931 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=0
+2026-06-16 22:01:26,939 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,940 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=45
+2026-06-16 22:01:26,949 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,950 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=0
+2026-06-16 22:01:26,959 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,967 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,968 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=0
+2026-06-16 22:01:26,976 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,978 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=0
+2026-06-16 22:01:26,986 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:26,986 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=False, total=2
+2026-06-16 22:01:26,994 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=42
+2026-06-16 22:01:26,995 - src.routes.serverless_routes - INFO - Jobs listed: user_id=42, is_admin=False, total=1
+2026-06-16 22:01:27,005 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:27,006 - src.routes.serverless_routes - INFO - Jobs listed: user_id=1, is_admin=True, total=10
+2026-06-16 22:01:27,014 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=42
+2026-06-16 22:01:27,015 - src.routes.serverless_routes - INFO - Jobs listed: user_id=42, is_admin=False, total=1
+2026-06-16 22:01:27,024 - src.routes.serverless_routes - INFO - GET /api/jobs - Request received: user_id=1
+2026-06-16 22:01:27,025 - src.routes.serverless_routes - ERROR - Failed to list jobs: Connection refused
+2026-06-16 22:01:27,032 - src.routes.serverless_routes - WARNING - GET /api/jobs/metrics - Authentication failed: no user_id in session
+2026-06-16 22:01:27,038 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,039 - src.routes.serverless_routes - WARNING - GET /api/jobs/metrics - Access denied: user_id=1 is not admin
+2026-06-16 22:01:27,047 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,048 - src.routes.serverless_routes - WARNING - GET /api/jobs/metrics - Access denied: user_id=1 is not admin
+2026-06-16 22:01:27,054 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,055 - src.routes.serverless_routes - INFO - Metrics retrieved by admin user_id=1
+2026-06-16 22:01:27,064 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,065 - src.routes.serverless_routes - INFO - Metrics retrieved by admin user_id=1
+2026-06-16 22:01:27,073 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,074 - src.routes.serverless_routes - INFO - Metrics retrieved by admin user_id=1
+2026-06-16 22:01:27,084 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,085 - src.routes.serverless_routes - INFO - Metrics retrieved by admin user_id=1
+2026-06-16 22:01:27,092 - src.routes.serverless_routes - INFO - GET /api/jobs/metrics - Request received: user_id=1
+2026-06-16 22:01:27,094 - src.routes.serverless_routes - ERROR - Failed to retrieve metrics: Connection refused
