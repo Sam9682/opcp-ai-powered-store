@@ -325,9 +325,21 @@ def api_application_actions(app_id):
             name = data.get('name')
             url = data.get('url', '')
             description = data.get('description', '')
+            new_id = data.get('new_id')
             
             if not name:
                 return jsonify({'error': 'Name required'}), 400
+            
+            target_id = int(new_id) if new_id is not None else app_id
+            
+            # If new_id is provided and different from current, check uniqueness
+            if target_id != app_id:
+                existing = db_manager.execute_query(
+                    'SELECT id FROM applications WHERE id = %s',
+                    (target_id,), fetch_one=True
+                )
+                if existing:
+                    return jsonify({'error': f'Application ID {target_id} already exists. Please choose a unique ID.'}), 400
             
             git_url = data.get('git_url', '')
             git_repo_size = data.get('git_repo_size', 50)
@@ -336,10 +348,26 @@ def api_application_actions(app_id):
             docker_stop_duration = data.get('docker_stop_duration')
             docker_ps_duration = data.get('docker_ps_duration')
             
-            db_manager.execute_query('''UPDATE applications SET name = %s, url = %s, description = %s, git_url = %s, git_repo_size = %s,
-                       docker_build_duration = %s, docker_start_duration = %s, docker_stop_duration = %s, docker_ps_duration = %s
-                WHERE id = %s
-            ''', (name, url, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration, app_id))
+            if target_id != app_id:
+                # ID is changing - run all updates in a single transaction with deferred constraints
+                with db_manager.get_db_connection() as conn:
+                    with conn.cursor() as cursor:
+                        cursor.execute('SET CONSTRAINTS ALL DEFERRED')
+                        cursor.execute('''UPDATE applications SET id = %s, name = %s, url = %s, description = %s, git_url = %s, git_repo_size = %s,
+                                   docker_build_duration = %s, docker_start_duration = %s, docker_stop_duration = %s, docker_ps_duration = %s
+                            WHERE id = %s
+                        ''', (target_id, name, url, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration, app_id))
+                        cursor.execute('UPDATE user_applications SET application_id = %s WHERE application_id = %s', (target_id, app_id))
+                        cursor.execute('UPDATE deployments SET application_id = %s WHERE application_id = %s', (target_id, app_id))
+                        cursor.execute('UPDATE application_costs SET application_id = %s WHERE application_id = %s', (target_id, app_id))
+                        cursor.execute('UPDATE billing_activities SET application_id = %s WHERE application_id = %s', (target_id, app_id))
+                    conn.commit()
+            else:
+                # ID unchanged - simple update
+                db_manager.execute_query('''UPDATE applications SET name = %s, url = %s, description = %s, git_url = %s, git_repo_size = %s,
+                           docker_build_duration = %s, docker_start_duration = %s, docker_stop_duration = %s, docker_ps_duration = %s
+                    WHERE id = %s
+                ''', (name, url, description, git_url, git_repo_size, docker_build_duration, docker_start_duration, docker_stop_duration, docker_ps_duration, app_id))
             
             return jsonify({'message': 'Application updated successfully'})
         

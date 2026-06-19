@@ -474,8 +474,9 @@
             <form id="updateAppManagementForm">
                 <input type="hidden" id="editAppMgmtId">
                 <div class="form-group">
-                    <label>Application ID:</label>
-                    <div id="editAppMgmtIdentity" class="readonly-field" style="color: green;"></div>
+                    <label for="editAppMgmtNewId">Application ID:</label>
+                    <input type="number" id="editAppMgmtNewId" min="1" required style="color: green; font-weight: bold;">
+                    <small id="editAppMgmtIdError" style="color: red; display: none;">This ID is already used by another application.</small>
                 </div>
                 <div class="form-group">
                     <label for="editAppMgmtName">Application Name:</label>
@@ -5931,7 +5932,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const appId = document.getElementById('editAppMgmtId').value;
+            const newId = parseInt(document.getElementById('editAppMgmtNewId').value);
+            
+            // Client-side uniqueness check for the new ID
+            if (newId !== parseInt(appId) && window._existingAppIds && window._existingAppIds.includes(newId)) {
+                document.getElementById('editAppMgmtIdError').style.display = 'block';
+                return;
+            }
+            document.getElementById('editAppMgmtIdError').style.display = 'none';
+            
             const appData = {
+                new_id: newId,
                 name: document.getElementById('editAppMgmtName').value,
                 url: document.getElementById('editAppMgmtUrl').value,
                 description: document.getElementById('editAppMgmtDescription').value,
@@ -5963,6 +5974,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    
+    // Real-time validation for Application ID uniqueness
+    const editAppMgmtNewIdInput = document.getElementById('editAppMgmtNewId');
+    if (editAppMgmtNewIdInput) {
+        editAppMgmtNewIdInput.addEventListener('input', function() {
+            const newId = parseInt(this.value);
+            const errorEl = document.getElementById('editAppMgmtIdError');
+            if (window._existingAppIds && window._existingAppIds.includes(newId)) {
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        });
+    }
 });
 
 function editAppManagement(appId) {
@@ -5975,8 +6000,11 @@ function editAppManagement(appId) {
                 return;
             }
             
+            // Store all existing IDs except the current one for uniqueness validation
+            window._existingAppIds = apps.filter(a => a.id !== appId).map(a => a.id);
+            
             document.getElementById('editAppMgmtId').value = app.id;
-            document.getElementById('editAppMgmtIdentity').textContent = app.id;
+            document.getElementById('editAppMgmtNewId').value = app.id;
             document.getElementById('editAppMgmtName').value = app.name;
             document.getElementById('editAppMgmtUrl').value = app.url;
             document.getElementById('editAppMgmtSwautomorphUrl').value = app.swautomorph_url || 'Not yet deployed';
@@ -5987,6 +6015,9 @@ function editAppManagement(appId) {
             document.getElementById('editAppMgmtDockerStartDuration').value = app.docker_start_duration || '';
             document.getElementById('editAppMgmtDockerStopDuration').value = app.docker_stop_duration || '';
             document.getElementById('editAppMgmtDockerPsDuration').value = app.docker_ps_duration || '';
+            
+            // Clear any previous ID error
+            document.getElementById('editAppMgmtIdError').style.display = 'none';
             
             showEditAppManagementForm();
         })
